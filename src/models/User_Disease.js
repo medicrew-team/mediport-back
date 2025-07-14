@@ -1,20 +1,13 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const Comment = sequelize.define('Comment', {
-    // 댓글 id
-    comment_id: {
+const User_Disease = sequelize.define('User_Disease', {
+    user_disease_id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
         autoIncrement: true,
+        primaryKey: true,
         allowNull: false
     },
-    // 댓글 내용
-    content: {
-        type:DataTypes.TEXT,
-        allowNull: false
-    },
-    // 작성자 ID (외래키)
     user_id: {
         type: DataTypes.STRING(255),
         allowNull: false,
@@ -25,24 +18,19 @@ const Comment = sequelize.define('Comment', {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
     },
-    // 게시판 ID (외래키)
-    board_id: {
+    disease_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Board',
-            key: 'board_id'
+            model: 'Disease',
+            key: 'disease_id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
-    },
-
+    }
 }, {
-    tableName: 'Comment',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    tableName: 'User_Disease',
+    timestamps: false,
 });
 
-module.exports = Comment;
-
+module.exports = User_Disease;

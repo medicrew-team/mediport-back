@@ -1,6 +1,7 @@
 const User = require('./User');
 const Board = require('./Board');
-const Chronic_disease = require('./Chronic_disease'); // 여기
+const Disease = require('./Disease');
+const User_Disease = require('./User_Disease');
 const Comment = require('./Comment');
 const Disease_prohibit_medi = require('./Disease_prohibit_medi'); // 여기
 const DUR_Chronic = require('./DUR_Chronic');
@@ -29,12 +30,14 @@ function setupAssociations() {
     Board.hasMany(Like,{foreignKey:'board_id',onDelete:'CASCADE',onUpdate:'CASCADE'})
     Like.belongsTo(Board,{foreignKey:'board_id'})
 
-    //user와 기저질환 1:N
-    User.hasMany(Chronic_disease, { foreignKey: 'user_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    Chronic_disease.belongsTo(User, { foreignKey: 'user_id' });
-    //기저질환과 기저질환 금지약품 M:N
-    Chronic_disease.hasMany(Disease_prohibit_medi, { foreignKey: 'chronic_disease_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    Disease_prohibit_medi.belongsTo(Chronic_disease, { foreignKey: 'chronic_disease_id' });
+    // User와 Disease의 다대다 관계 설정
+    User.belongsToMany(Disease, { through: User_Disease, foreignKey: 'user_id' });
+    Disease.belongsToMany(User, { through: User_Disease, foreignKey: 'disease_id' });
+
+    //Disease와 Disease_prohibit_medi 1:M
+    Disease.hasMany(Disease_prohibit_medi, { foreignKey: 'disease_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    Disease_prohibit_medi.belongsTo(Disease, { foreignKey: 'disease_id' });
+
     //기저질환 금지약품과 DUR-기저질환 M:N
     DUR_Chronic.hasMany(Disease_prohibit_medi, { foreignKey: 'dur_chronic_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
     Disease_prohibit_medi.belongsTo(DUR_Chronic, { foreignKey: 'dur_chronic_id' });
