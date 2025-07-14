@@ -14,12 +14,12 @@ const Disease_prohibit_medi = sequelize.define('Disease_prohibit_medi', {
      },
     // 질병 ID (외래키)
 
-    chronic_disease_id: {
+    disease_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'ChronicDisease', // ChronicDisease 모델 참조
-            key: 'chronic_disease_id'
+            model: 'Disease', // Disease 모델 참조
+            key: 'disease_id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'

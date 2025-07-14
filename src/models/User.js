@@ -4,8 +4,7 @@ const { sequelize } = require('../config/sequelize');
 const User = sequelize.define('User', {
     // 사용자 아이디
     user_id: {
-      type: DataTypes.INTEGER, 
-      autoIncrement: true,     
+      type: DataTypes.STRING(255),     
       primaryKey: true,        
       allowNull: false         
     },
@@ -36,11 +35,6 @@ const User = sequelize.define('User', {
     country:{
         type: DataTypes.STRING(50),
         allowNull: true  
-    },
-    firebase_uid:{
-        type: DataTypes.STRING(28),
-        allowNull: false, // Firebase UID는 필수 사항으로 설정
-        unique: true, // Firebase UID는 고유해야 함
     },
     created_at: {
         type: DataTypes.DATE,

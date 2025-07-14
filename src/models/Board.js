@@ -24,7 +24,7 @@ const Board = sequelize.define('Board', {
     },
     // 작성자 ID (외래키)
     user_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(255),
         allowNull: false,
         references: {
             model: 'User',
@@ -39,6 +39,11 @@ const Board = sequelize.define('Board', {
         defaultValue: 0,
         allowNull: false
     },
+    // 게시판 카테고리
+    category: {
+        type: DataTypes.STRING(50),
+        allowNull: true
+    }
 
 }, {
     tableName: 'Board',

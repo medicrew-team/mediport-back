@@ -11,7 +11,7 @@ const Like = sequelize.define('Like', {
     },
     // 작성자 ID (외래키)
     user_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(255),
         allowNull: false,
         references: {
             model: 'User',
