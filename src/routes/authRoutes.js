@@ -93,6 +93,7 @@ router.post('/logout', verifyToken, authController.logoutUser);
  *             required:
  *               - username
  *               - phone
+ *               - country
  *             properties:
  *               username:
  *                 type: string
@@ -102,6 +103,10 @@ router.post('/logout', verifyToken, authController.logoutUser);
  *                 type: string
  *                 description: 사용자 전화번호 (하이픈 포함)
  *                 example: 010-1234-5678
+ *               country:
+ *                 type: string
+ *                 description: 사용자 국가
+ *                 example: South Korea
  *               disease_ids:
  *                 type: array
  *                 items:

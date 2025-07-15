@@ -33,18 +33,22 @@ class AuthService {
     }
 
     /* 회원가입 */
-    async registerUser(registerUserDto) {
+    async registerUser(firebaseUid, email, registerUserDto) {
         try {
             // 1. Firebase UID로 사용자 존재 여부 확인
-            const existingUser = await userService.getUserProfile(registerUserDto.firebaseUid);
+            const existingUser = await userService.getUserProfile(firebaseUid);
             if (existingUser) {
-                throw new Error('이미 가입된 사용자입니다.');
+                return { userProfile: existingUser, created: false };
             }
+
+            // DTO에 UID와 이메일 추가
+            registerUserDto.firebaseUid = firebaseUid;
+            registerUserDto.email = email;
 
             // 2. 사용자 생성 (userService의 createUser 함수 사용)
             const newUser = await userService.createUser(registerUserDto);
 
-            return newUser;
+            return { userProfile: newUser, created: true };
         } catch (error) {
             console.error('회원가입 에러 : ', error);
             throw new Error(`회원가입 실패: ${error.message}`);

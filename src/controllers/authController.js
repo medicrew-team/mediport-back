@@ -35,26 +35,27 @@ exports.logoutUser = async (req, res, next) => {
 
 exports.registerUser = async (req, res, next) => {
     try {
-        const { username, phone, disease_ids } = req.body;
-        const firebaseUid = req.user.uid; // verifyToken 미들웨어에서 주입된 UID 사용
+        const firebaseUid = req.user.uid;
+        const email = req.user.email; 
+        const { username, phone, country, disease_ids } = req.body;
 
-        const registerUserDto = new RegisterUserDto({
-            firebaseUid,
-            username,
-            phone,
-            disease_ids
-        });
+        const registerDto = new RegisterUserDto(username, phone, country, disease_ids);
 
-        const newUser = await authService.registerUser(registerUserDto);
-        res.status(201).json({
-            message: '회원가입 성공',
-            user: new UserResponseDto(newUser)
-        });
+        const { userProfile, created } = await authService.registerUser(firebaseUid, email, registerDto);
+
+        if (created) {
+            res.status(201).json({
+                message: '회원가입이 완료 되었습니다.',
+                userProfile: new UserResponseDto(userProfile)
+            });
+        } else {
+            res.status(200).json({ 
+                message: '이미 존재하는 유저입니다. 새로운 회원가입은 이루어지지 않았습니다.', 
+                userProfile: new UserResponseDto(userProfile)
+            });
+        }
     } catch (error) {
         console.error("회원가입 에러: ", error);
-        if (error.message.includes('이미 가입된 사용자')) {
-            return res.status(409).json({ message: error.message }); // Conflict
-        }
         res.status(500).json({
             message: error.message || '서버 에러'
         });

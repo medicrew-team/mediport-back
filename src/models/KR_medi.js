@@ -10,7 +10,8 @@ const KR_medi = sequelize.define('KR_medi', {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
+        field: 'kr_medi_id'
     },
     // 제품명
     prod_name: {
