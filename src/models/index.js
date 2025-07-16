@@ -46,11 +46,11 @@ function setupAssociations() {
     International_medi.hasMany(Similar_medi,{foreignKey:'International_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
     Similar_medi.belongsTo(International_medi,{foreignKey:'International_medi_id'});
     //의약품과 유사약품 1:M
-    KR_medi.hasMany(Similar_medi,{foreignKey:'KR_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
-    Similar_medi.belongsTo(KR_medi,{foreignKey:'KR_medi_id'});
+    KR_medi.hasMany(Similar_medi,{foreignKey:'kr_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
+    Similar_medi.belongsTo(KR_medi,{foreignKey:'kr_medi_id'});
     //의약품과 DUR_MEDI 1:M
-    KR_medi.hasMany(DUR_medi,{foreignKey:'KR_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
-    DUR_medi.belongsTo(KR_medi,{foreignKey:'KR_medi_id'});
+    KR_medi.hasMany(DUR_medi,{foreignKey:'kr_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
+    DUR_medi.belongsTo(KR_medi,{foreignKey:'kr_medi_id'});
 
     console.log('모든 모델 관계가 설정되었습니다.');
 }

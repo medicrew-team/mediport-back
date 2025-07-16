@@ -20,6 +20,7 @@ async function createTestUser() {
         });
         console.log('Successfully created new Firebase user:', userRecord.uid, 'with email:', email);
         console.log('Use this email and password to get an ID Token.');
+        console.log(userRecord)
     } catch (error) {
         if (error.code === 'auth/email-already-exists') {
             console.warn('Firebase user already exists with this email. Skipping creation.');

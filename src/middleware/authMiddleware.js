@@ -2,32 +2,24 @@ const admin = require('../config/firebaseAdmin');
 const { body, validationResult } = require('express-validator');
 
 const verifyToken = async (req, res, next) => {
-    // 개발 환경에서만 토큰 검증을 건너뛰고 가짜 사용자 정보 주입
-    if (process.env.NODE_ENV === 'development' && !req.headers.authorization) {
-        console.warn('개발 모드: 토큰 검증을 건너뛰고 가짜 사용자 정보를 주입합니다.');
-        req.user = {
-            uid: 'test_user_uid',
-            email: 'test@example.com',
-            name: 'Test User',
-            // 필요한 다른 필드 추가
-        };
-        return next();
-    }
-
-    const idToken = req.headers.authorization?.split('Bearer ')[1];
+    const authHeader = req.headers.authorization || '';
+    
+    // 정규식으로 Bearer 토큰 파싱 (예외 방지)
+    const match = authHeader.match(/^Bearer (.+)$/);
+    const idToken = match ? match[1] : null;
 
     if (!idToken) {
         return res.status(401).json({
             message: 'Unauthorized: 토큰이 제공되지 않았습니다.'
         });
     }
+
     try {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
-
         req.user = decodedToken;
         next();
     } catch (error) {
-        console.error('Firebase Id token error: ', error);
+        console.error('Firebase ID Token Error:', error.code || error.message);
         return res.status(403).json({
             message: '토큰이 유효하지 않거나 만료되었습니다.'
         });

@@ -3,11 +3,12 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
 const International_medi = sequelize.define('International_medi', {
-    International_Medi_id: {
+    international_medi_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
+        field: 'International_Medi_id'
     },
     // 제품명
     prod_name: {

@@ -53,16 +53,32 @@ class UserService {
             await user.save();
 
             // 기저질환 정보 업데이트 (기존 삭제 후 새로 생성)
-            await User_Disease.destroy({
-                where: { user_id: firebaseUid }
-            });
-
             if (updateDto.disease_ids && updateDto.disease_ids.length > 0) {
+                // disease_ids 유효성 검사
+                const foundDiseases = await Disease.findAll({
+                    where: {
+                        disease_id: updateDto.disease_ids
+                    }
+                });
+
+                if (foundDiseases.length !== updateDto.disease_ids.length) {
+                    throw new Error('존재하지 않는 질병 ID가 포함되어 있습니다.');
+                }
+
+                await User_Disease.destroy({
+                    where: { user_id: firebaseUid }
+                });
+
                 const userDiseaseData = updateDto.disease_ids.map(disease_id => ({
                     user_id: firebaseUid,
                     disease_id: disease_id
                 }));
                 await User_Disease.bulkCreate(userDiseaseData);
+            } else {
+                // 업데이트하려는 질병 목록이 없는 경우, 기존 관계 모두 삭제
+                await User_Disease.destroy({
+                    where: { user_id: firebaseUid }
+                });
             }
 
             // 업데이트된 사용자 정보 반환 (기저질환 포함)

@@ -14,10 +14,11 @@ const Similar_medi = sequelize.define('Similar_medi',{
         allowNull: false,
         references: {
             model: 'International_medi',
-            key: 'International_medi_id'
+            key: 'international_medi_id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
+        field: 'International_medi_id'
     },
     kr_medi_id: {
         type: DataTypes.INTEGER,
@@ -27,7 +28,8 @@ const Similar_medi = sequelize.define('Similar_medi',{
             key: 'kr_medi_id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
+        field: 'kr_medi_id'
     }
 },{
     tableName: 'Similar_medi'

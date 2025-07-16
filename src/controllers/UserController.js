@@ -2,12 +2,12 @@ const UserService = require("../services/UserService");
 const UpdateProfileDto = require('../dtos/User/updateProfileDto');
 const UserResponseDto = require('../dtos/auth/userResponseDto');
 const authService = require("../services/authService");
-
+const RegisterUserDto = require('../dtos/User/registerUserDto');
 
 
 exports.registerUser = async (req, res, next) => {
     try {
-        const firebaseUid = req.user.id;
+        const firebaseUid = req.user.uid;
         const email = req.user.email; 
         const { username, phone, country, disease_ids } = req.body;
 
