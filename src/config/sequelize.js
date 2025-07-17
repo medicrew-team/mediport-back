@@ -21,7 +21,7 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     host: DB_HOST,
     port: DB_PORT,
     dialect: DB_DIALECT,
-    logging: false, // 로그 비활성화
+    logging: console.log,
     pool: {          // 연결 풀 설정
         max: 5,
         min: 0,

@@ -65,27 +65,28 @@ class BoardController {
     async getBoardById(req, res, next) {
         try {
             const { boardId } = req.params;
-            const board = await boardService.getBoardById(boardId);
-
+            const { category } = req.query; 
+            const board = await boardService.getBoardById(boardId,category);
             const author = board.User ? new UserResponseDto(board.User) : null;
             const commentCount = board.Comments ? board.Comments.length : 0;
             const likeCount = board.Likes ? board.Likes.length : 0;
             const comments = board.Comments ? board.Comments.map(comment => new CommentResponseDto(comment, comment.User ? new UserResponseDto(comment.User) : null)) : [];
 
             const boardResponse = new BoardResponseDto(board, author, commentCount, likeCount, comments);
-
+            console.log("게시글 상세 조회 성공: ", boardResponse);
             res.status(200).json({
                 message: '게시글 상세 조회 성공',
                 board: boardResponse
             });
         } catch (error) {
+            console.log("boardId",req.params.boardId);
             console.error("게시글 상세 조회 에러: ", error);
             const statusCode = error.message.includes('찾을 수 없습니다') ? 404 :
                                error.message.includes('권한이 없습니다') ? 403 : 500;
             res.status(statusCode).json({
                 message: error.message || '서버 에러'
             });
-        }
+        }l
     }
 
     async updateBoard(req, res, next) {

@@ -25,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/boards', boardRoutes);
 
+
 // 기본 라우트 (루트 경로 접근 시)
 app.get('/', (req, res) => {
     res.send('Welcome to Mediport Back-end API!');

@@ -109,6 +109,11 @@ router.post('/', verifyToken, boardController.createBoard);
  *           type: integer
  *         required: true
  *         description: 조회할 게시글 ID
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: 카테고리 필터링
  *     responses:
  *       200:
  *         description: 게시글 상세 조회 성공

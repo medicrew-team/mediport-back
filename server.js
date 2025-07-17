@@ -22,7 +22,7 @@ async function startServer() {
         // 3. Sequelize 모델들을 DB와 동기화 (개발 환경에서만 권장)
         // 주의: production 환경에서는 마이그레이션 도구를 사용해야 합니다.
         if (process.env.NODE_ENV === 'development') {
-            await sequelize.sync({ force: true }); // 개발 시: 테이블이 없으면 생성, 변경사항 있으면 수정
+            await sequelize.sync({ alter: true }); // 개발 시: 테이블이 없으면 생성, 변경사항 있으면 수정
             console.log('모든 모델이 성공적으로 동기화되었습니다.');
         }
 

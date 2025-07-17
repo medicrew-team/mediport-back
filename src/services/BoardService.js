@@ -71,27 +71,29 @@ class BoardService {
         }
     }
 
-    async getBoardById(boardId) {
+    async getBoardById(boardId,category) {
         try {
             const board = await Board.findByPk(boardId, {
                 include: [
                     {
                         model: User, // 게시글 작성자
-                        attributes: ['user_id', 'user_name']
+                        attributes: ['user_id', 'user_name','email', 'phone', 'country']
                     },
                     {
                         model: Comment, // 댓글 목록
                         include: {
                             model: User, // 댓글 작성자
-                            attributes: ['user_id', 'user_name']
+                            attributes: ['user_id', 'user_name', 'country'] 
                         }
                     },
                     {
                         model: Like, // 좋아요 누른 사용자 목록 (좋아요 수 카운트용)
                         attributes: ['user_id']
                     }
-                ],
-                order: [[Comment, 'created_at', 'ASC']] // 댓글은 오래된 순으로 정렬
+                ], 
+                order: [[Comment, 'created_at', 'ASC']], // 댓글은 오래된 순으로 정렬
+                where: category
+                
             });
 
             if (!board) {

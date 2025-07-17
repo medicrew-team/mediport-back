@@ -92,13 +92,7 @@ class UserService {
     // 사용자 프로필 조회
     async getUserProfile(firebaseUid) {
         try {
-            const user = await User.findByPk(firebaseUid, {
-                include: [{
-                    model: Disease,
-                    attributes: ['disease_id', 'disease_name'],
-                    through: { attributes: [] } // 중간 테이블의 정보는 가져오지
-                }]
-            });
+            const user = await User.findByPk(firebaseUid);
             if (!user) {
                 throw new Error('사용자를 찾을 수 없습니다.');
             }
@@ -106,6 +100,26 @@ class UserService {
         } catch (error) {
             console.error('사용자 프로필 조회 에러 : ', error);
             throw new Error(`사용자 프로필 조회 실패: ${error.message}`);
+        }
+    }
+
+    // 사용자 기저질환 조회
+    async getUserDiseases(firebaseUid) {
+        try {
+            const user = await User.findByPk(firebaseUid, {
+                include: [{
+                    model: Disease,
+                    attributes: ['disease_id', 'disease_name'],
+                    through: { attributes: [] }
+                }]
+            });
+            if (!user) {
+                throw new Error('사용자를 찾을 수 없습니다.');
+            }
+            return user.Diseases;
+        } catch (error) {
+            console.error('사용자 기저질환 조회 에러 : ', error);
+            throw new Error(`사용자 기저질환 조회 실패: ${error.message}`);
         }
     }
     // 사용자 탈퇴
