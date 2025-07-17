@@ -107,6 +107,88 @@ router.put(
 
 /**
  * @swagger
+ * /api/users/profile/diseases:
+ *   get:
+ *     summary: 사용자 기저질환 조회
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 사용자 기저질환 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 사용자 기저질환 조회 성공
+ *                 diseases:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       disease_id:
+ *                         type: integer
+ *                       disease_name:
+ *                         type: string
+ *       401:
+ *         description: 인증 실패 (유효하지 않은 토큰)
+ *       404:
+ *         description: 사용자를 찾을 수 없음
+ *       500:
+ *         description: 서버 에러
+ */
+router.get(
+    '/profile/diseases',
+    verifyToken,
+    UserController.getUserDiseases
+);
+
+/**
+ * @swagger
+ * /api/users/profile/diseases:
+ *   get:
+ *     summary: 사용자 기저질환 조회
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 사용자 기저질환 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 사용자 기저질환 조회 성공
+ *                 diseases:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       disease_id:
+ *                         type: integer
+ *                       disease_name:
+ *                         type: string
+ *       401:
+ *         description: 인증 실패 (유효하지 않은 토큰)
+ *       404:
+ *         description: 사용자를 찾을 수 없음
+ *       500:
+ *         description: 서버 에러
+ */
+router.get(
+    '/profile/diseases',
+    verifyToken,
+    UserController.getUserDiseases
+);
+
+/**
+ * @swagger
  * /api/users/withdraw:
  *   delete:
  *     summary: 사용자 탈퇴

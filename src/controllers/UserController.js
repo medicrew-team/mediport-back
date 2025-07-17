@@ -51,6 +51,23 @@ exports.getUserProfile = async (req, res, next) => {
     }
 };
 
+// 사용자 기저질환 조회
+exports.getUserDiseases = async (req, res, next) => {
+    try {
+        const firebaseUid = req.user.uid;
+        const diseases = await UserService.getUserDiseases(firebaseUid);
+        res.status(200).json({
+            message: '사용자 기저질환 조회 성공',
+            diseases: diseases
+        });
+    } catch (error) {
+        console.error("사용자 기저질환 조회 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};
+
 
 // 사용자 정보 업데이트
 exports.updateUserProfile = async (req, res, next) => {

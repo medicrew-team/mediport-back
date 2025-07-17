@@ -4,7 +4,7 @@ class CommentResponseDto {
         this.content = comment.content;
         this.createdAt = comment.created_at;
         this.updatedAt = comment.updated_at;
-        this.author = author; // UserResponseDto
+        this.author = author;
     }
 }
 
