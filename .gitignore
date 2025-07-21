@@ -5,3 +5,7 @@ node_modules/
 
 # firebase key json
 mediport.json
+key.json
+
+
+frontend/
