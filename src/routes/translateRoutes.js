@@ -5,6 +5,6 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 // 통합 번역 라우트
-router.post('/translate', upload.single('audio'), translateController.processTranslation);
+router.post('/', upload.single('audio'), translateController.processTranslation);
 
 module.exports = router;
