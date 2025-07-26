@@ -7,9 +7,11 @@ const morgan = require('morgan'); // HTTP 요청 로거 (개발용)
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/UserRoutes');
 const boardRoutes = require('./routes/BoardRoutes'); // 게시판 라우트 추가
+const translateRoutes = require('./routes/translateRoutes');
 const { swaggerUi, specs } = require('./config/swaggerConfig'); // Swagger 설정 가져오기
 
 const app = express();
+
 
 // 미들웨어 설정
 app.use(cors());
@@ -24,11 +26,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/boards', boardRoutes);
+app.use('/api/translate', translateRoutes);
 
 
 // 기본 라우트 (루트 경로 접근 시)
-app.get('/', (req, res) => {
-    res.send('Welcome to Mediport Back-end API!');
-});
+const path = require('path');
+
+// 정적 파일 제공 (프론트엔드)
+app.use(express.static(path.join(__dirname, '../../frontend')));
+
+
 
 module.exports = app; 
