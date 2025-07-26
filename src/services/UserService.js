@@ -1,7 +1,7 @@
 const admin = require('../config/firebaseAdmin');
-const User = require('../models/User');
-const User_Disease = require('../models/User_Disease');
-const Disease = require('../models/Disease');
+const User = require('../models/user');
+const User_Disease = require('../models/user_disease');
+const Disease = require('../models/disease');
 
 
 class UserService {

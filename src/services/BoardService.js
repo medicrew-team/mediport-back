@@ -1,8 +1,8 @@
 const { sequelize, Op } = require('../config/sequelize');
-const Board = require('../models/Board');
-const User = require('../models/User');
-const Comment = require('../models/Comment');
-const Like = require('../models/Like');
+const Board = require('../models/board');
+const User = require('../models/user');
+const Comment = require('../models/comment');
+const Like = require('../models/like');
 
 class BoardService {
     async createBoard(userId, boardDto) {
