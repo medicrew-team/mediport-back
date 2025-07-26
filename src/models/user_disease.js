@@ -1,18 +1,19 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const User_Disease = sequelize.define('User_Disease', {
+const user_disease = sequelize.define('user_disease', {
     user_disease_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
+        field: 'user_disease_id'
     },
     user_id: {
         type: DataTypes.STRING(255),
         allowNull: false,
         references: {
-            model: 'User',
+            model: 'user',
             key: 'user_id'
         },
         onUpdate: 'CASCADE',
@@ -22,15 +23,15 @@ const User_Disease = sequelize.define('User_Disease', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Disease',
+            model: 'disease',
             key: 'disease_id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
     }
 }, {
-    tableName: 'User_Disease',
+    tableName: 'user_disease',
     timestamps: false,
 });
 
-module.exports = User_Disease;
+module.exports = user_disease;

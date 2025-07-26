@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const Similar_medi = sequelize.define('Similar_medi',{
+const similar_medi = sequelize.define('similar_medi',{
     similar_medi_id:
     {
        type: DataTypes.INTEGER,
@@ -13,18 +13,18 @@ const Similar_medi = sequelize.define('Similar_medi',{
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'International_medi',
+            model: 'international_medi',
             key: 'international_medi_id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
-        field: 'International_medi_id'
+        field: 'international_medi_id'
     },
     kr_medi_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'KR_medi',
+            model: 'kr_medi',
             key: 'kr_medi_id'
         },
         onUpdate: 'CASCADE',
@@ -32,7 +32,7 @@ const Similar_medi = sequelize.define('Similar_medi',{
         field: 'kr_medi_id'
     }
 },{
-    tableName: 'Similar_medi'
+    tableName: 'similar_medi'
 })
 
-module.exports= Similar_medi;
+module.exports= similar_medi;

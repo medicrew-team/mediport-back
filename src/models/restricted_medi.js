@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const Restricted_medi = sequelize.define('Restricted_medi',{
+const restricted_medi = sequelize.define('restricted_medi',{
     restricted_medi_id:
     {
        type: DataTypes.INTEGER,
@@ -21,12 +21,17 @@ const Restricted_medi = sequelize.define('Restricted_medi',{
         type: DataTypes.STRING(255),
         allowNull: false,
     },
-    Medi_img: {
+    medi_img: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+    },
+    punish: {
         type: DataTypes.STRING(255),
         allowNull: false,
     }
 },{
-    tableName: 'Restricted_medi'
+    tableName: 'restricted_medi',
+    timestamps: false
 })
 
-module.exports= Restricted_medi;
+module.exports= restricted_medi;

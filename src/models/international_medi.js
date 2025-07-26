@@ -2,13 +2,13 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const International_medi = sequelize.define('International_medi', {
+const international_medi = sequelize.define('international_medi', {
     international_medi_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false,
-        field: 'International_Medi_id'
+        field: 'international_medi_id'
     },
     // 제품명
     prod_name: {
@@ -36,7 +36,7 @@ const International_medi = sequelize.define('International_medi', {
         allowNull: true
     }
 }, {
-    tableName: 'International_medi', // 실제 DB 테이블 이름과 일치하는지 확인 (대소문자)
+    tableName: 'international_medi', // 실제 DB 테이블 이름과 일치하는지 확인 (대소문자)
 });
 
-module.exports = International_medi;
+module.exports = international_medi;

@@ -1,56 +1,65 @@
-const User = require('./User');
-const Board = require('./Board');
-const Disease = require('./Disease');
-const User_Disease = require('./User_Disease');
-const Comment = require('./Comment');
-const Disease_prohibit_medi = require('./Disease_prohibit_medi'); // 여기
-const DUR_Chronic = require('./DUR_Chronic');
-const DUR_medi = require('./DUR_medi');
-const International_medi = require('./International_medi');
-const KR_medi = require('./KR_medi');
-const Like = require('./Like');
-const Restricted_medi = require('./Restricted_medi');
-const Similar_medi = require('./Similar_medi');
-
+const user = require('./user');
+const board = require('./board');
+const disease = require('./disease');
+const user_disease = require('./user_disease');
+const comment = require('./comment');
+const disease_prohibit_medi = require('./disease_prohibit_medi'); 
+const dur_chronic = require('./dur_chronic');
+const dur_medi = require('./dur_medi');
+const international_medi = require('./international_medi');
+const kr_medi = require('./kr_medi');
+const like = require('./like');
+const restricted_medi = require('./restricted_medi');
+const similar_medi = require('./similar_medi');
+const category = require('./category');
+const user_medi_history = require('./user_medi_history');
 // 2. 모델 관계 설정 함수 정의
 function setupAssociations() {
     //user와 게시판 1:M
-    User.hasMany(Board, { foreignKey: 'user_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    Board.belongsTo(User, { foreignKey: 'user_id' });
+    user.hasMany(board, { foreignKey: 'user_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    board.belongsTo(user, { foreignKey: 'user_id' });
     //게시판과 댓글 1:M
-    Board.hasMany(Comment, { foreignKey: 'board_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    Comment.belongsTo(Board, { foreignKey: 'board_id' });
+    board.hasMany(comment, { foreignKey: 'board_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    comment.belongsTo(board, { foreignKey: 'board_id' });
     //user와 댓글 1:M
-    User.hasMany(Comment, { foreignKey: 'user_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    Comment.belongsTo(User, { foreignKey: 'user_id' });
+    user.hasMany(comment, { foreignKey: 'user_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    comment.belongsTo(user, { foreignKey: 'user_id' });
     //user와 추천 1:M
-    User.hasMany(Like,{foreignKey:'user_id',onDelete:'CASCADE',onUpdate:'CASCADE'})
-    Like.belongsTo(User,{foreignKey:'user_id'})
-    //Board와 추천 1:M
-    Board.hasMany(Like,{foreignKey:'board_id',onDelete:'CASCADE',onUpdate:'CASCADE'})
-    Like.belongsTo(Board,{foreignKey:'board_id'})
+    user.hasMany(like,{foreignKey:'user_id',onDelete:'CASCADE',onUpdate:'CASCADE'})
+    like.belongsTo(user,{foreignKey:'user_id'})
+    //board와 추천 1:M
+    board.hasMany(like,{foreignKey:'board_id',onDelete:'CASCADE',onUpdate:'CASCADE'})
+    like.belongsTo(board,{foreignKey:'board_id'})
+    //게시판과 카테고리 1:M
+    board.belongsTo(category, { foreignKey: 'category_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    category.hasMany(board, { foreignKey: 'category_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });   
+     
+    //user와 kr_medi의 다대다 관계 설정
+    user.belongsToMany(kr_medi, { through: user_medi_history, foreignKey: 'user_id' });
+    kr_medi.belongsToMany(user, { through: user_medi_history, foreignKey: 'kr_medi_id' });
 
-    // User와 Disease의 다대다 관계 설정
-    User.belongsToMany(Disease, { through: User_Disease, foreignKey: 'user_id' });
-    Disease.belongsToMany(User, { through: User_Disease, foreignKey: 'disease_id' });
 
-    //Disease와 Disease_prohibit_medi 1:M
-    Disease.hasMany(Disease_prohibit_medi, { foreignKey: 'disease_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    Disease_prohibit_medi.belongsTo(Disease, { foreignKey: 'disease_id' });
+    // user와 disease의 다대다 관계 설정
+    user.belongsToMany(disease, { through: user_disease, foreignKey: 'user_id' });
+    disease.belongsToMany(user, { through: user_disease, foreignKey: 'disease_id' });
 
-    //기저질환 금지약품과 DUR-기저질환 M:N
-    DUR_Chronic.hasMany(Disease_prohibit_medi, { foreignKey: 'dur_chronic_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    Disease_prohibit_medi.belongsTo(DUR_Chronic, { foreignKey: 'dur_chronic_id' });
+    //disease와 disease_prohibit_medi 1:M
+    disease.hasMany(disease_prohibit_medi, { foreignKey: 'disease_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    disease_prohibit_medi.belongsTo(disease, { foreignKey: 'disease_id' });
+
+    //기저질환 금지약품과 dur-기저질환 M:N
+    dur_chronic.hasMany(disease_prohibit_medi, { foreignKey: 'dur_chronic_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    disease_prohibit_medi.belongsTo(dur_chronic, { foreignKey: 'dur_chronic_id' });
     
     //국제약품과 유사약품 1:M
-    International_medi.hasMany(Similar_medi,{foreignKey:'International_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
-    Similar_medi.belongsTo(International_medi,{foreignKey:'International_medi_id'});
+    international_medi.hasMany(similar_medi,{foreignKey:'international_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
+    similar_medi.belongsTo(international_medi,{foreignKey:'international_medi_id'});
     //의약품과 유사약품 1:M
-    KR_medi.hasMany(Similar_medi,{foreignKey:'kr_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
-    Similar_medi.belongsTo(KR_medi,{foreignKey:'kr_medi_id'});
-    //의약품과 DUR_MEDI 1:M
-    KR_medi.hasMany(DUR_medi,{foreignKey:'kr_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
-    DUR_medi.belongsTo(KR_medi,{foreignKey:'kr_medi_id'});
+    kr_medi.hasMany(similar_medi,{foreignKey:'kr_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
+    similar_medi.belongsTo(kr_medi,{foreignKey:'kr_medi_id'});
+    //의약품과 dur_MEDI 1:M
+    kr_medi.hasMany(dur_medi,{foreignKey:'kr_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});
+    dur_medi.belongsTo(kr_medi,{foreignKey:'kr_medi_id'});
 
     console.log('모든 모델 관계가 설정되었습니다.');
 }

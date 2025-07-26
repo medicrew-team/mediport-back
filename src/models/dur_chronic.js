@@ -2,7 +2,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const DUR_Chronic = sequelize.define('DUR_Chronic', {
+const dur_chronic = sequelize.define('dur_chronic', {
     // 기저질환 DUR ID
     dur_chronic_id: {
         type: DataTypes.INTEGER,
@@ -29,7 +29,7 @@ const DUR_Chronic = sequelize.define('DUR_Chronic', {
     atc_ing: { 
         type: DataTypes.STRING(255), 
         allowNull: false,
-        field: 'ATC_ing' 
+        field: 'atc_ing' 
     },
     // 약품이미지
     dur_prod_img: {
@@ -37,8 +37,8 @@ const DUR_Chronic = sequelize.define('DUR_Chronic', {
         allowNull: true
     }
 }, {
-    tableName: 'DUR_Chronic', 
+    tableName: 'dur_chronic', 
     timestamps: false,
 });
 
-module.exports = DUR_Chronic;
+module.exports = dur_chronic;

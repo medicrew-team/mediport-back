@@ -4,7 +4,7 @@ const { sequelize } = require('../config/sequelize');
 
 
 
-const Disease_prohibit_medi = sequelize.define('Disease_prohibit_medi', {
+const disease_prohibit_medi = sequelize.define('disease_prohibit_medi', {
     
     disease_prohibit_medi_id: {
         type: DataTypes.INTEGER,
@@ -18,7 +18,7 @@ const Disease_prohibit_medi = sequelize.define('Disease_prohibit_medi', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Disease', // Disease 모델 참조
+            model: 'disease', // Disease 모델 참조
             key: 'disease_id'
         },
         onUpdate: 'CASCADE',
@@ -29,15 +29,15 @@ const Disease_prohibit_medi = sequelize.define('Disease_prohibit_medi', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'DUR_Chronic', // DUR_Chronic 모델 참조
+            model: 'dur_chronic', // DUR_Chronic 모델 참조
             key: 'dur_chronic_id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
 },
 },{
-    tableName: 'Disease_prohibit_medi',
+    tableName: 'disease_prohibit_medi',
     timestamps: false,
 });
 
-module.exports = Disease_prohibit_medi;
+module.exports = disease_prohibit_medi;

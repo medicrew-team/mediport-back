@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const User = sequelize.define('User', {
+const user = sequelize.define('user', {
     // 사용자 아이디
     user_id: {
       type: DataTypes.STRING(255),     
@@ -41,8 +41,8 @@ const User = sequelize.define('User', {
         allowNull: false,
         defaultValue: DataTypes.NOW // 기본값으로 현재 시간 설정
     }}, {
-    tableName: 'User',
+    tableName: 'user',
     timestamps: false,
   });
 
-module.exports= User;
+module.exports= user;

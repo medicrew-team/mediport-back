@@ -1,12 +1,17 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const Like = sequelize.define('Like', {
-    // 추천 id
-    like_id: {
+const comment = sequelize.define('comment', {
+    // 댓글 id
+    comment_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        allowNull: false
+    },
+    // 댓글 내용
+    content: {
+        type:DataTypes.TEXT,
         allowNull: false
     },
     // 작성자 ID (외래키)
@@ -14,7 +19,7 @@ const Like = sequelize.define('Like', {
         type: DataTypes.STRING(255),
         allowNull: false,
         references: {
-            model: 'User',
+            model: 'user',
             key: 'user_id'
         },
         onUpdate: 'CASCADE',
@@ -25,7 +30,7 @@ const Like = sequelize.define('Like', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Board',
+            model: 'board',
             key: 'board_id'
         },
         onUpdate: 'CASCADE',
@@ -33,7 +38,11 @@ const Like = sequelize.define('Like', {
     },
 
 }, {
-    tableName: 'Like'
+    tableName: 'comment',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
-module.exports = Like;
+module.exports = comment;
+

@@ -4,7 +4,7 @@ const { sequelize } = require('../config/sequelize');
 
 
 
-const KR_medi = sequelize.define('KR_medi', {
+const kr_medi = sequelize.define('kr_medi', {
     // 약물 ID
     kr_medi_id: {
         type: DataTypes.INTEGER,
@@ -63,8 +63,8 @@ const KR_medi = sequelize.define('KR_medi', {
         type: DataTypes.STRING(255),
         allowNull: true
     }},{
-    tableName: 'KR_medi',
+    tableName: 'kr_medi',
     timestamps: false,
     });
 
-    module.exports = KR_medi;
+    module.exports = kr_medi;
