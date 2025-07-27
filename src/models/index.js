@@ -2,8 +2,7 @@ const user = require('./user');
 const board = require('./board');
 const disease = require('./disease');
 const user_disease = require('./user_disease');
-const comment = require('./comment');
-const disease_prohibit_medi = require('./disease_prohibit_medi'); 
+const comment = require('./comment'); 
 const dur_chronic = require('./dur_chronic');
 const dur_medi = require('./dur_medi');
 const international_medi = require('./international_medi');
@@ -43,13 +42,9 @@ function setupAssociations() {
     user.belongsToMany(disease, { through: user_disease, foreignKey: 'user_id' });
     disease.belongsToMany(user, { through: user_disease, foreignKey: 'disease_id' });
 
-    //disease와 disease_prohibit_medi 1:M
-    disease.hasMany(disease_prohibit_medi, { foreignKey: 'disease_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    disease_prohibit_medi.belongsTo(disease, { foreignKey: 'disease_id' });
-
-    //기저질환 금지약품과 dur-기저질환 M:N
-    dur_chronic.hasMany(disease_prohibit_medi, { foreignKey: 'dur_chronic_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-    disease_prohibit_medi.belongsTo(dur_chronic, { foreignKey: 'dur_chronic_id' });
+    
+    disease.hasMany(dur_chronic, { foreignKey: 'disease_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    dur_chronic.belongsTo(disease, { foreignKey: 'disease_id' });
     
     //국제약품과 유사약품 1:M
     international_medi.hasMany(similar_medi,{foreignKey:'international_medi_id',onDelete: 'CASCADE',onUpdate:'CASCADE'});

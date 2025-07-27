@@ -2,7 +2,7 @@
 const app = require('./src/app'); // app.js에서 Express 애플리케이션 인스턴스 가져오기
 const { sequelize, connectDB } = require('./src/config/sequelize'); // sequelize 인스턴스 및 연결 함수 가져오기
 const setupModels = require('./src/models');
-
+const redisClient = require('./src/config/redisClient'); // Redis 설정 가져오기
 
 
 // 포트 설정 (환경 변수 사용 또는 기본값)
@@ -25,8 +25,7 @@ async function startServer() {
             await sequelize.sync({ force: true }); // 개발 시: 테이블이 없으면 생성, 변경사항 있으면 수정
             console.log('모든 모델이 성공적으로 동기화되었습니다.');
         }
-
-
+        
         // 4. Express 서버 시작
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);

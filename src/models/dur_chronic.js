@@ -10,6 +10,17 @@ const dur_chronic = sequelize.define('dur_chronic', {
         primaryKey: true,
         allowNull: false
     },
+    // 기저질환 ID (외래키)
+    disease_id : {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'disease', // Disease 모델 참조
+            key: 'disease_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+    },
     // 제품명
     dur_prod_name: {
         type: DataTypes.STRING(255), 
@@ -30,6 +41,11 @@ const dur_chronic = sequelize.define('dur_chronic', {
         type: DataTypes.STRING(255), 
         allowNull: false,
         field: 'atc_ing' 
+    },
+    // 주의사항
+    caution: {
+        type: DataTypes.TEXT,
+        allowNull: true
     },
     // 약품이미지
     dur_prod_img: {

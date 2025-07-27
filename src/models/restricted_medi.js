@@ -28,6 +28,16 @@ const restricted_medi = sequelize.define('restricted_medi',{
     punish: {
         type: DataTypes.STRING(255),
         allowNull: false,
+    },
+    //대체 약품
+    substitute: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+    },
+    // 대체약품 이미지
+    substitute_img: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
     }
 },{
     tableName: 'restricted_medi',

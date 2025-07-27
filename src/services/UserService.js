@@ -3,7 +3,6 @@ const User = require('../models/user');
 const User_Disease = require('../models/user_disease');
 const Disease = require('../models/disease');
 
-
 class UserService {
     /* 회원가입 */
     async registerUser(firebaseUid,email,registerDto){
@@ -122,6 +121,23 @@ class UserService {
             throw new Error(`사용자 기저질환 조회 실패: ${error.message}`);
         }
     }
+    // 사용자 기저질환 금기약품 조회
+    async getUserDiseasesProhibit(disease_id) {
+        try {
+            const diseaseProhibit = await diesase_prohibit_medi.findAll({
+                where: { disease_id: disease_id },
+                attributes: ['dur_chronic_id', 'dur_prod_name', 'ing_code', 'atc_code', 'atc_ing', 'caution', 'dur_prod_img']
+            });
+            if (!diseaseProhibit || diseaseProhibit.length === 0) {
+                throw new Error('해당 기저질환에 대한 금기약품이 없습니다.');
+            }
+            return diseaseProhibit;
+        
+    }    catch (error) {
+            console.error('사용자 기저질환 금기약품 조회 에러 : ', error);
+            throw new Error(`사용자 기저질환 금기약품 조회 실패: ${error.message}`);
+        }
+    }
     // 사용자 탈퇴
     async deleteUser(firebaseUid) {
         try {
@@ -139,7 +155,7 @@ class UserService {
             await admin.auth().deleteUser(firebaseUid);
             return { success: true, message: '사용자가 성공적으로 탈퇴되었습니다.' };
         } catch (error) {
-            console.error('사용자 탈퇴퇴 에러 : ', error);
+            console.error('사용자 탈퇴 에러 : ', error);
             throw new Error(`사용자 탈퇴 실패: ${error.message}`);
         }
     }

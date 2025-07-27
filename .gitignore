@@ -9,3 +9,5 @@ key.json
 
 
 frontend/
+
+redis.conf

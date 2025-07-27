@@ -32,6 +32,12 @@ const user = sequelize.define('user', {
                 msg: '전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678'
         }
     }},
+    // 사용자 거주 지역
+    region: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    // 사용자 국가
     country:{
         type: DataTypes.STRING(50),
         allowNull: true  
