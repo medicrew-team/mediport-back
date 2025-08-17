@@ -1,42 +1,56 @@
-// src/models/DUR_Chronic.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const international_medi = sequelize.define('international_medi', {
+const InternationalMedi = sequelize.define('InternationalMedi', {
     international_medi_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false,
-        field: 'international_medi_id'
+        allowNull: false
     },
-    // 제품명
     prod_name: {
-        type: DataTypes.STRING(255), // 충분한 길이로 변경 권장 (또는 실제 최대 길이 확인 후 설정)
-        allowNull: false
+        type: DataTypes.STRING(100),
+        allowNull: true
     },
-    // 주성분코드
-    ing_code: {
-        type: DataTypes.STRING(50), // 실제 코드 길이에 맞춰 확인
-        allowNull: false
-    },
-    // 국가
     country: {
-        type: DataTypes.STRING(50), // 실제 코드 길이에 맞춰 확인
-        allowNull: false
+        type: DataTypes.STRING(100),
+        allowNull: true
     },
-    // 성분명 (모델 필드명 소문자, DB 컬럼명 대문자일 경우 field 옵션 사용)
-    atc_ing: { 
-        type: DataTypes.STRING(255), 
-        allowNull: false,
+    matching: {
+        type: DataTypes.STRING(255),
+        allowNull: true
     },
-    // 약품이미지
-    dur_prod_img: {
+    realsame: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    bit: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    atc_code: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    ing_name: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    ing_code: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    prod_code: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    prod_img: {
         type: DataTypes.STRING(255),
         allowNull: true
     }
 }, {
-    tableName: 'international_medi', // 실제 DB 테이블 이름과 일치하는지 확인 (대소문자)
+    tableName: 'international_medi',
+    timestamps: false
 });
 
-module.exports = international_medi;
+module.exports = InternationalMedi;

@@ -49,7 +49,7 @@ class BoardController {
 
             res.status(200).json({
                 message: '게시글 목록 조회 성공',
-                totalItems: count.length, // count is an array of objects with board_id and count
+                totalItems: count.length,
                 totalPages: Math.ceil(count.length / limit),
                 currentPage: page,
                 boards: boardsResponse

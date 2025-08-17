@@ -52,24 +52,16 @@ const { route } = require('./authRoutes');
  *           schema:
  *             type: object
  *             properties:
- *               username:
- *                 type: string
- *                 description: 업데이트할 사용자 이름
  *               phone:
  *                 type: string
  *                 description: 업데이트할 사용자 전화번호
- *               country:
- *                 type: string
- *                 description: 업데이트할 사용자 국가
  *               disease_ids:
  *                 type: array
  *                 items:
  *                   type: integer
  *                 description: 업데이트할 기저질환 ID 목록
  *             example:
- *               username: "업데이트된유저"
  *               phone: "010-1111-2222"
- *               country: "USA"
  *               disease_ids: [2, 4]
  *     responses:
  *       200:
@@ -143,6 +135,48 @@ router.put(
  */
 router.get('/profile/diseases',verifyToken,UserController.getUserDiseases);
 
+/**
+ * @swagger
+ * /api/users/profile/diseases/{disease_id}:
+ *   get:
+ *     summary: 특정 기저질환에 대한 금기 약물 정보 조회
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: disease_id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: 금기 약물 정보를 조회할 기저질환 ID
+ *     responses:
+ *       200:
+ *         description: 금기 약물 정보 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "금기 약물 정보 조회 성공"
+ *                 prohibited_medications:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       medi_name:
+ *                         type: string
+ *                       prohibit_reason:
+ *                         type: string
+ *       401:
+ *         description: 인증 실패 (유효하지 않은 토큰)
+ *       404:
+ *         description: 해당 기저질환 정보를 찾을 수 없음
+ *       500:
+ *         description: 서버 에러
+ */
 router.get('/profile/diseases/:disease_id', verifyToken, UserController.getUserProhibitMedi);
 
 /**

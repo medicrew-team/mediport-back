@@ -9,9 +9,9 @@ exports.registerUser = async (req, res, next) => {
     try {
         const firebaseUid = req.user.uid;
         const email = req.user.email; 
-        const { username, phone, country, disease_ids } = req.body;
-
-        const registerDto = new RegisterUserDto(username, phone, country, disease_ids);
+        const { username,nickname ,phone, country,region,gender,birthday,disease_ids } = req.body;
+``
+        const registerDto = new RegisterUserDto( username,nickname ,phone, country,region,gender,birthday,disease_ids );
 
         const { userProfile, created } = await authService.registerUser(firebaseUid, email, registerDto);
 
@@ -89,9 +89,8 @@ exports.getUserProhibitMedi = async (req, res, next) => {
 exports.updateUserProfile = async (req, res, next) => {
     try {
         const firebaseUid = req.user.uid;
-        const { username, phone, country, disease_ids } = req.body;
-
-        const updateDto = new UpdateProfileDto(username, phone, country, disease_ids);
+        const { phone, disease_ids } = req.body;
+        const updateDto = new UpdateProfileDto( phone, disease_ids);
 
         const updatedUser = await UserService.updateUser(firebaseUid, updateDto);
 

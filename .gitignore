@@ -11,3 +11,6 @@ key.json
 frontend/
 
 redis.conf
+
+docker-compose.yml
+Dockerfile

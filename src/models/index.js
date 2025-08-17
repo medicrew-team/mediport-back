@@ -39,7 +39,7 @@ function setupAssociations() {
 
 
     // user와 disease의 다대다 관계 설정
-    user.belongsToMany(disease, { through: user_disease, foreignKey: 'user_id' });
+    user.belongsToMany(disease, { through: user_disease, foreignKey: 'user_id', as: 'Diseases' });
     disease.belongsToMany(user, { through: user_disease, foreignKey: 'disease_id' });
 
     

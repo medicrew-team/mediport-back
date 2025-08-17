@@ -1,8 +1,6 @@
 class updateProfileDto {
-    constructor(username, phone, country, disease_ids) {
-        this.username = username;
+    constructor(phone, disease_ids) {
         this.phone = phone;
-        this.country = country;
         this.disease_ids = disease_ids;
     }
 }

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const disease = sequelize.define('disease', {
+const Disease = sequelize.define('Disease', {
     disease_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -17,4 +17,4 @@ const disease = sequelize.define('disease', {
     timestamps: false,
 });
 
-module.exports = disease;
+module.exports = Disease;

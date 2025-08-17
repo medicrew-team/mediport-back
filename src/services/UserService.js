@@ -2,6 +2,7 @@ const admin = require('../config/firebaseAdmin');
 const User = require('../models/user');
 const User_Disease = require('../models/user_disease');
 const Disease = require('../models/disease');
+const DUR_chronic = require('../models/dur_chronic');
 
 class UserService {
     /* 회원가입 */
@@ -18,16 +19,9 @@ class UserService {
                     user_name: registerDto.username,
                     phone: registerDto.phone,
                     country: registerDto.country
-                })
-    
-                if (registerDto.disease_ids && registerDto.disease_ids.length > 0) {
-                    const userDiseaseData = registerDto.disease_ids.map(disease_id => ({
-                        user_id: newUser.user_id,
-                        disease_id: disease_id
-                    }));
-                    await User_Disease.bulkCreate(userDiseaseData);
-                }
-    
+                });
+
+
                 return {User : newUser , created: true};
             }
             catch(error){
@@ -46,9 +40,7 @@ class UserService {
             }
 
             // 사용자 기본 정보 업데이트
-            user.user_name = updateDto.username || user.user_name;
             user.phone = updateDto.phone || user.phone;
-            user.country = updateDto.country || user.country;
             await user.save();
 
             // 기저질환 정보 업데이트 (기존 삭제 후 새로 생성)
@@ -81,7 +73,8 @@ class UserService {
             }
 
             // 업데이트된 사용자 정보 반환 (기저질환 포함)
-            return this.loginUser(firebaseUid); // loginUser 재사용하여 기저질환 포함된 최신 정보 가져옴
+            const updatedUserWithDiseases = await this.getUserProfile(firebaseUid);
+            return updatedUserWithDiseases;
 
         } catch (error) {
             console.error('사용자 정보 업데이트 에러 : ', error);
@@ -91,7 +84,14 @@ class UserService {
     // 사용자 프로필 조회
     async getUserProfile(firebaseUid) {
         try {
-            const user = await User.findByPk(firebaseUid);
+            const user = await User.findByPk(firebaseUid,{
+                include: [{
+                    model: Disease,
+                    as: 'Diseases',
+                    attributes: ['disease_id', 'disease_name'],
+                    through: { attributes: [] } // 연결 테이블의 속성은 필요 없으므로 비워둠
+                }]
+            });
             if (!user) {
                 throw new Error('사용자를 찾을 수 없습니다.');
             }
@@ -108,6 +108,7 @@ class UserService {
             const user = await User.findByPk(firebaseUid, {
                 include: [{
                     model: Disease,
+                    as: 'Diseases',
                     attributes: ['disease_id', 'disease_name'],
                     through: { attributes: [] }
                 }]
@@ -124,7 +125,7 @@ class UserService {
     // 사용자 기저질환 금기약품 조회
     async getUserDiseasesProhibit(disease_id) {
         try {
-            const diseaseProhibit = await diesase_prohibit_medi.findAll({
+            const diseaseProhibit = await DUR_chronic.findAll({
                 where: { disease_id: disease_id },
                 attributes: ['dur_chronic_id', 'dur_prod_name', 'ing_code', 'atc_code', 'atc_ing', 'caution', 'dur_prod_img']
             });
