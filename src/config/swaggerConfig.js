@@ -24,12 +24,49 @@ const options = {
         },
       },
       schemas: {
+        CreateUserDto: {
+          type: 'object',
+          properties: {
+            username: { type: 'string' },
+            nickname: { type: 'string' },
+            phone: { type: 'string' },
+            country: { type: 'string' },
+            region: { type: 'string' },
+            gender: { type: 'string' },
+            birthday: { type: 'string', format: 'date' },
+            disease_ids: {
+              type: 'array',
+              items: {
+                type: 'integer'
+              }
+            }
+          },
+          required: ['username', 'nickname', 'phone', 'country', 'region', 'gender', 'birthday'],
+        },
+        UpdateProfileDto: {
+          type: 'object',
+          properties: {
+            username: { type: 'string' },
+            phone: { type: 'string' },
+            country: { type: 'string' },
+            disease_ids: {
+              type: 'array',
+              items: {
+                type: 'integer'
+              }
+            }
+          }
+        },
         UserResponseDto: {
           type: 'object',
           properties: {
             userId: { type: 'string' },
             email: { type: 'string', format: 'email' },
             username: { type: 'string' },
+            nickname: { type: 'string' },
+            gender: { type: 'string' },
+            birthday: { type: 'string', format: 'date' },
+            region: { type: 'string' },
             phone: { type: 'string' },
             country: { type: 'string' },
             createdAt: { type: 'string', format: 'date-time' },

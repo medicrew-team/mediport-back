@@ -1,48 +1,56 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const user = sequelize.define('user', {
-    // 사용자 아이디
-    user_id: {
-      type: DataTypes.STRING(255),     
-      primaryKey: true,        
-      allowNull: false         
-    },
-    // 사용자 이메일
-    email: {
-      type: DataTypes.STRING(255), 
-      allowNull: false,            
-      unique: true,                
-      validate: {
-        isEmail: true              
-      }
-    },
-    // 사용자 이름
-    user_name: {
-        type: DataTypes.STRING(255),
-        allowNull: true              
-    },
-    // 사용자 전화번호
-    phone: {
-        type: DataTypes.STRING(20),
-        allowNull: true,
-        validate: {
-            is: {
-                args: /^\d{3}-\d{3,4}-\d{4}$/,
-                msg: '전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678'
-        }
-    }},
-    country:{
-        type: DataTypes.STRING(50),
-        allowNull: true  
-    },
-    created_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW // 기본값으로 현재 시간 설정
-    }}, {
-    tableName: 'user',
-    timestamps: false,
-  });
+const User = sequelize.define('user', {
+  user_id: {
+    type: DataTypes.STRING(255),
+    primaryKey: true,
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    unique: true
+  },
+  user_name: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  nickname: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    unique: true
+  },
+  gender: {
+    type: DataTypes.STRING(10),
+    allowNull: false
+  },
+  birthday: {
+    type: DataTypes.DATEONLY,
+    allowNull: false
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  region: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  country: {
+    type: DataTypes.STRING(50),
+    allowNull: true
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW
+  }
+}, {
+  tableName: 'user',
+  timestamps: true,
+  updatedAt: false,
+  createdAt: 'created_at'
+});
 
-module.exports= user;
+module.exports = User;

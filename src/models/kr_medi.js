@@ -1,70 +1,92 @@
 const { DataTypes } = require('sequelize');
-
 const { sequelize } = require('../config/sequelize');
 
-
-
-const kr_medi = sequelize.define('kr_medi', {
-    // 약물 ID
+const KrMedi = sequelize.define('KrMedi', {
     kr_medi_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false,
-        field: 'kr_medi_id'
+        allowNull: false
     },
-    // 제품명
     prod_name: {
         type: DataTypes.STRING(255),
         allowNull: false
     },
-    // 주성분코드
-    ing_code: {
-        type: DataTypes.STRING(255),
-        allowNull: false
-    },
-    // ATC코드
-    atc_code: {
-        type: DataTypes.STRING(255),
-        allowNull: false
-    },
-    // 성분명
-    ATC_ing: {
-        type: DataTypes.STRING(255),
-        allowNull: false
-    },
-    // BIT
-    bit: {
-        type: DataTypes.STRING(255),
+    medi_form: {
+        type: DataTypes.STRING(100),
         allowNull: true
     },
-    // ICD
+    medi_volume: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    category: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    bit: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    atc_code: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    ing_name: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    prod_code: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    ing_code: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    purchase_loc: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
     icd: {
         type: DataTypes.STRING(255),
         allowNull: true
     },
-    // 복용법
+    icd_sum: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
     dosage: {
         type: DataTypes.STRING(255),
         allowNull: true
     },
-    // 주의사항
-    caution: {
-        type: DataTypes.TEXT,
+    contraindicated: {
+        type: DataTypes.STRING(255),
         allowNull: true
     },
-    // 약품이미지
+    storage_method: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    daily_interaction: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    drug_interaction: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    adverse_reaction: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
     prod_img: {
         type: DataTypes.STRING(255),
         allowNull: true
-    },
-    // 분류
-    category: {
-        type: DataTypes.STRING(255),
-        allowNull: true
-    }},{
+    }
+},{
     tableName: 'kr_medi',
-    timestamps: false,
-    });
+    timestamps: false
+});
 
-    module.exports = kr_medi;
+module.exports = KrMedi;

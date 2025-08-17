@@ -2,6 +2,7 @@ const express = require('express');
 const router= express.Router();
 const UserController  = require('../controllers/UserController')
 const { verifyToken, validate, registerValidationRules, updateProfileValidationRules } = require('../middleware/authMiddleware');
+const { route } = require('./authRoutes');
 
 /**
  * @swagger
@@ -51,24 +52,16 @@ const { verifyToken, validate, registerValidationRules, updateProfileValidationR
  *           schema:
  *             type: object
  *             properties:
- *               username:
- *                 type: string
- *                 description: 업데이트할 사용자 이름
  *               phone:
  *                 type: string
  *                 description: 업데이트할 사용자 전화번호
- *               country:
- *                 type: string
- *                 description: 업데이트할 사용자 국가
  *               disease_ids:
  *                 type: array
  *                 items:
  *                   type: integer
  *                 description: 업데이트할 기저질환 ID 목록
  *             example:
- *               username: "업데이트된유저"
  *               phone: "010-1111-2222"
- *               country: "USA"
  *               disease_ids: [2, 4]
  *     responses:
  *       200:
@@ -140,23 +133,26 @@ router.put(
  *       500:
  *         description: 서버 에러
  */
-router.get(
-    '/profile/diseases',
-    verifyToken,
-    UserController.getUserDiseases
-);
+router.get('/profile/diseases',verifyToken,UserController.getUserDiseases);
 
 /**
  * @swagger
- * /api/users/profile/diseases:
+ * /api/users/profile/diseases/{disease_id}:
  *   get:
- *     summary: 사용자 기저질환 조회
+ *     summary: 특정 기저질환에 대한 금기 약물 정보 조회
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: disease_id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: 금기 약물 정보를 조회할 기저질환 ID
  *     responses:
  *       200:
- *         description: 사용자 기저질환 조회 성공
+ *         description: 금기 약물 정보 조회 성공
  *         content:
  *           application/json:
  *             schema:
@@ -164,28 +160,24 @@ router.get(
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 사용자 기저질환 조회 성공
- *                 diseases:
+ *                   example: "금기 약물 정보 조회 성공"
+ *                 prohibited_medications:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
- *                       disease_id:
- *                         type: integer
- *                       disease_name:
+ *                       medi_name:
+ *                         type: string
+ *                       prohibit_reason:
  *                         type: string
  *       401:
  *         description: 인증 실패 (유효하지 않은 토큰)
  *       404:
- *         description: 사용자를 찾을 수 없음
+ *         description: 해당 기저질환 정보를 찾을 수 없음
  *       500:
  *         description: 서버 에러
  */
-router.get(
-    '/profile/diseases',
-    verifyToken,
-    UserController.getUserDiseases
-);
+router.get('/profile/diseases/:disease_id', verifyToken, UserController.getUserProhibitMedi);
 
 /**
  * @swagger

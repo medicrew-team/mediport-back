@@ -9,9 +9,9 @@ exports.registerUser = async (req, res, next) => {
     try {
         const firebaseUid = req.user.uid;
         const email = req.user.email; 
-        const { username, phone, country, disease_ids } = req.body;
-
-        const registerDto = new RegisterUserDto(username, phone, country, disease_ids);
+        const { username,nickname ,phone, country,region,gender,birthday,disease_ids } = req.body;
+``
+        const registerDto = new RegisterUserDto( username,nickname ,phone, country,region,gender,birthday,disease_ids );
 
         const { userProfile, created } = await authService.registerUser(firebaseUid, email, registerDto);
 
@@ -67,15 +67,30 @@ exports.getUserDiseases = async (req, res, next) => {
         });
     }
 };
-
+// 사용자 기저질환 금기약품 조회
+exports.getUserProhibitMedi = async (req, res, next) => {
+    try {
+        const disease_id = req.params.disease_id;
+        const prohibit_medi = await UserService.getUserDiseasesProhibit(disease_id);
+        res.status(200).json({
+            message: '사용자 기저질환 금기약품 조회 성공',
+            prohibit_medi: prohibit_medi
+        });
+    }
+    catch (error) {
+        console.error("사용자 기저질환 금기약품 조회 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+}
 
 // 사용자 정보 업데이트
 exports.updateUserProfile = async (req, res, next) => {
     try {
         const firebaseUid = req.user.uid;
-        const { username, phone, country, disease_ids } = req.body;
-
-        const updateDto = new UpdateProfileDto(username, phone, country, disease_ids);
+        const { phone, disease_ids } = req.body;
+        const updateDto = new UpdateProfileDto( phone, disease_ids);
 
         const updatedUser = await UserService.updateUser(firebaseUid, updateDto);
 
