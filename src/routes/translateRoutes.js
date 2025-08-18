@@ -12,32 +12,36 @@ const upload = multer({ dest: 'uploads/' });
  */
 
 /**
+ * =====================================
+ * ✅ OpenAPI 3.0 스타일
+ * =====================================
  * @swagger
  * /api/translate:
  *   post:
  *     summary: 통합 번역 (음성, 텍스트, 이미지)
  *     tags: [Translate]
- *     consumes:
- *       - multipart/form-data
- *     parameters:
- *       - in: formData
- *         name: audio
- *         type: file
- *         description: 번역할 음성 파일 (Opus)
- *       - in: formData
- *         name: source_lang
- *         type: string
- *         required: true
- *         description: 원본 언어 코드 (e.g., 'KO', 'EN')
- *       - in: formData
- *         name: target_lang
- *         type: string
- *         required: true
- *         description: 타겟 언어 코드 (e.g., 'EN', 'KO')
- *       - in: formData
- *         name: text
- *         type: string
- *         description: 번역할 텍스트 (음성 파일이 없을 경우 사용)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               audio:
+ *                 type: string
+ *                 format: binary
+ *                 description: 번역할 음성 파일 (Opus)
+ *               sourceLanguage:
+ *                 type: string
+ *                 description: 원본 언어 코드 (e.g., 'KO', 'EN')
+ *                 example: "KO"
+ *               targetLanguage:
+ *                 type: string
+ *                 description: 타겟 언어 코드 (e.g., 'EN', 'KO')
+ *                 example: "EN"
+ *               text:
+ *                 type: string
+ *                 description: 번역할 텍스트 (음성 파일이 없을 경우 사용)
  *     responses:
  *       200:
  *         description: 번역 성공
