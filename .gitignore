@@ -12,5 +12,4 @@ frontend/
 
 redis.conf
 
-docker-compose.yml
-Dockerfile
+*.sql

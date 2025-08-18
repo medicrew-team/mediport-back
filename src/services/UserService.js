@@ -3,9 +3,14 @@ const User = require('../models/user');
 const User_Disease = require('../models/user_disease');
 const Disease = require('../models/disease');
 const DUR_chronic = require('../models/dur_chronic');
+const { Translate } = require('@google-cloud/translate').v2;
+const redisClient = require('../config/redisClient');
+const translate = new Translate();
 
 class UserService {
-    /* 회원가입 */
+
+    
+    /** 회원가입 */
     async registerUser(firebaseUid,email,registerDto){
             try{
                 const existingUser = await User.findByPk(firebaseUid);
@@ -29,8 +34,22 @@ class UserService {
                 throw new Error(`회원가입 실패 : ${error.message}`)
             }
         };
+    /** 텍스트 번역 */
+    async translateWithCache(text, targetLanguage) {
+        const cacheKey = `translate:${targetLanguage}:${text}`;
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
 
-    /* 사용자 정보 업데이트 */
+        const [translated] = await translate.translate(text, targetLanguage);
+        await redisClient.set(cacheKey, translated, 'EX', 604800); // 7일 동안 캐시
+        return translated;
+    };    
+
+   
+
+    /** 사용자 정보 업데이트 */
     async updateUser(firebaseUid, updateDto) {
         try {
             const user = await User.findByPk(firebaseUid);
@@ -81,7 +100,7 @@ class UserService {
             throw new Error(`사용자 정보 업데이트 실패: ${error.message}`);
         }
     }
-    // 사용자 프로필 조회
+    /** 사용자 프로필 조회 */ 
     async getUserProfile(firebaseUid) {
         try {
             const user = await User.findByPk(firebaseUid,{
@@ -102,7 +121,7 @@ class UserService {
         }
     }
 
-    // 사용자 기저질환 조회
+    /** 사용자 기저질환 조회 */ 
     async getUserDiseases(firebaseUid) {
         try {
             const user = await User.findByPk(firebaseUid, {
@@ -122,8 +141,8 @@ class UserService {
             throw new Error(`사용자 기저질환 조회 실패: ${error.message}`);
         }
     }
-    // 사용자 기저질환 금기약품 조회
-    async getUserDiseasesProhibit(disease_id) {
+    /** 기저질환 금기약품 조회 */
+    async getUserDiseasesProhibit(disease_id,target_lang= 'ko') {
         try {
             const diseaseProhibit = await DUR_chronic.findAll({
                 where: { disease_id: disease_id },
@@ -132,14 +151,39 @@ class UserService {
             if (!diseaseProhibit || diseaseProhibit.length === 0) {
                 throw new Error('해당 기저질환에 대한 금기약품이 없습니다.');
             }
-            return diseaseProhibit;
+            if (target_lang !== 'ko') {
+                await Promise.all(diseaseProhibit.map(async (item) => {
+                    item.dataValues.caution_translated = await this.translateWithCache(item.caution, target_lang);
+                  }));
+                return diseaseProhibit;
+            }
+            return diseaseProhibit;    
         
     }    catch (error) {
             console.error('사용자 기저질환 금기약품 조회 에러 : ', error);
             throw new Error(`사용자 기저질환 금기약품 조회 실패: ${error.message}`);
         }
     }
-    // 사용자 탈퇴
+    /** 금기약품 상세정보 조회 */
+    async getProhibitMediDetail(prod_name, target_lang = 'ko') {
+        try {
+            const prohibitDetail = await DUR_chronic.findOne({
+                where: { dur_prod_name: prod_name },
+                attributes: ['dur_chronic_id', 'dur_prod_name', 'ing_code', 'atc_code', 'atc_ing', 'caution', 'dur_prod_img']
+            });
+            if (!prohibitDetail) {
+                throw new Error('해당 금기약품에 대한 정보가 없습니다.');
+            }
+            if (target_lang !== 'ko') {
+                prohibitDetail.dataValues.caution_translated = await this.translateWithCache(prohibitDetail.caution, target_lang);
+            }
+            return prohibitDetail;
+        } catch (error) {
+            console.error('금기약품 상세정보 조회 에러 : ', error);
+            throw new Error(`금기약품 상세정보 조회 실패: ${error.message}`);
+        }
+    };
+    /** 회원 탈퇴 */
     async deleteUser(firebaseUid) {
         try {
             const user = await User.findByPk(firebaseUid);
@@ -161,10 +205,6 @@ class UserService {
         }
     }
 }
-
-
-
-
 
 module.exports = new UserService();
 
