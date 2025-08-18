@@ -101,6 +101,7 @@ router.post('/logout', verifyToken, authController.logoutUser);
  *                 type: string
  *                 example: "South Korea"
  *               region:
+ *               region:
  *                 type: string
  *                 example: "Seoul"
  *               disease_ids:
