@@ -4,6 +4,8 @@ FROM node:18
 # 작업 디렉토리 설정
 WORKDIR /usr/src/app
 
+RUN apt-get update && apt-get install -y ffmpeg
+
 # 앱 종속성 설치
 # 와일드카드를 사용해 package.json과 package-lock.json을 모두 복사
 COPY package*.json ./
