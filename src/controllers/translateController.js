@@ -3,30 +3,28 @@ const translateService = require('../services/translateService');
 // 통합 번역 처리 컨트롤러
 const processTranslation = async (req, res) => {
     try {
-        const { inputType, sourceLanguage, targetLanguage, text } = req.body;
+        const { sourceLanguage, targetLanguage, text } = req.body;
         const audioFile = req.file;
 
         let result;
 
-        if (inputType === 'audio') {
-            if (!audioFile) {
-                return res.status(400).json({ message: 'No audio file uploaded for audio input type.' });
-            }
+        if (audioFile) {
+            // 음성 파일 번역
             result = await translateService.sttTranslateTts(audioFile.path, sourceLanguage, targetLanguage);
-        } else if (inputType === 'text') {
-            if (!text) {
-                return res.status(400).json({ message: 'No text provided for text input type.' });
-            }
+        } else if (text) {
+            // 텍스트 번역
             result = await translateService.textTranslateTts(text, targetLanguage);
         } else {
-            return res.status(400).json({ message: 'Invalid inputType specified.' });
+            return res.status(400).json({ message: 'No valid input provided (need audio or text).' });
         }
 
         res.json({
             originalText: result.originalText,
             translatedText: result.translatedText,
             audioContentBase64: result.audioContent ? result.audioContent.toString('base64') : null,
-            message: result.tts_unsupported ? 'TTS not supported for this language.' : 'Translation successful.'
+            message: result.tts_unsupported 
+                ? 'TTS not supported for this language.' 
+                : 'Translation successful.'
         });
 
     } catch (error) {
