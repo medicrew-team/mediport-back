@@ -2,11 +2,40 @@ const express = require('express');
 const router  = express.Router();
 const ocrController = require('../controllers/ocrController');
 const { verifyToken } = require('../middleware/authMiddleware');
-
 const path   = require('path');
 const multer = require('multer');
 const fs = require('fs');
-const upload = multer({ dest: 'uploads/' });
+
+const UPLOAD_DIR = path.join(__dirname, 'uploads');
+try {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+} catch (err) {
+  console.error('Failed to create upload directory:', err);
+  throw err;
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    const base = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, base + ext); // 확장자 유지
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/tiff', 'image/tif'];
+    if (allowedTypes.includes(file.mimetype)) {
+        return cb(null, true);
+    }
+    cb(new Error('Only image files (png, jpg, jpeg, webp, tiff) are allowed'));
+};
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB 예시
+  fileFilter,
+});
 
 /**
  * @swagger
@@ -30,16 +59,12 @@ const upload = multer({ dest: 'uploads/' });
  *           schema:
  *             type: object
  *             required:
- *               - file
+ *               - image
  *             properties:
- *               file:
+ *               image:
  *                 type: string
  *                 format: binary
  *                 description: 업로드할 이미지 파일 (jpg, png 등)
- *               language:
- *                 type: string
- *                 description: OCR 대상 언어 코드 (예: ko, en, ja, cn)
- *                 example: ko
  *     responses:
  *       200:
  *         description: OCR 처리 성공
@@ -79,8 +104,6 @@ const upload = multer({ dest: 'uploads/' });
  *         description: 서버 오류
  */
 router.post('/foreign-medicine/image', upload.single('file'), ocrController.parseImage)
-
-
 
 
 

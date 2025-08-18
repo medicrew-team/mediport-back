@@ -9,28 +9,25 @@ const OCR_URL = 'https://mediport-ai-dev.store/ocr/foreign-medicine';
 exports.parseImage = async( file ) => {
     if ( !file ) throw new Error('file is required');
     
-    const form = new FormData();
-    
     try{
-        const { data, status } = await axios.post(OCR_URL, form, {
-            headers: {
-            ...form.getHeaders()
-            }
-        });
-        console.log(data);
+      const form = new FormData();
+      form.append('file', fs.createReadStream(file.path), file.originalname);
+
+      const { data } = await axios.post(OCR_URL, form, {
+          headers: {
+          ...form.getHeaders(),
+          Authorization: 'Bearer your-token',
+          },
+      });
+        console.log('data:', data);
         return data;
-    } catch ( error ) {
-
-    if (err.response) {
-
-      console.error('status:', err.response.status, 'data:', err.response.data);
-      // 그대로 throw해서 컨트롤러가 502/504 같은 걸 내려줄 수 있음
-      throw new Error(`Upstream error: ${err.response.status}`);
+    } catch (error) {
+      if (error.response) {
+      console.error('status:', error.response.status, 'data:', error.response.data, 'loc:', error.response.data.detail?.[0]?.loc);
+      throw new Error(`Upstream error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
     } else {
-
-      console.error('network/timeout:', err.message);
+      console.error('network:', error.message);
       throw new Error('Upstream connection error');
     }
-
-    }
+  }
 };

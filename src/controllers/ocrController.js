@@ -3,7 +3,6 @@ const fs = require('fs/promises');
 
 exports.parseImage = async ( req, res ) => {
         const file = req.file;
-        console.log('1.file :', file);
     try {
         if (!file) {
         return res.status(400).json({ message: 'file 필드가 필요합니다.' });
