@@ -166,6 +166,9 @@ class UserService {
                     as: 'Diseases',
                     attributes: ['disease_id', 'disease_name'],
                     through: { attributes: [] } // 연결 테이블의 속성은 필요 없으므로 비워둠
+                }, {
+                    model : User_Medi_History,
+                    as: 'User_Medi_History'
                 }]
             });
             if (!user) {
@@ -210,7 +213,7 @@ class UserService {
             }
             if (target_lang !== 'ko') {
                 await Promise.all(diseaseProhibit.map(async (item) => {
-                    item.dataValues.caution_translated = await this.translateWithCache(item.caution, target_lang);
+                    item.dataValues.caution = await this.translateWithCache(item.caution, target_lang);
                   }));
                 return diseaseProhibit;
             }
@@ -232,7 +235,7 @@ class UserService {
                 throw new Error('해당 금기약품에 대한 정보가 없습니다.');
             }
             if (target_lang !== 'ko') {
-                prohibitDetail.dataValues.caution_translated = await this.translateWithCache(prohibitDetail.caution, target_lang);
+                prohibitDetail.dataValues.caution = await this.translateWithCache(prohibitDetail.caution, target_lang);
             }
             return prohibitDetail;
         } catch (error) {

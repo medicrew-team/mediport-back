@@ -4,35 +4,7 @@ const UserResponseDto = require('../dtos/auth/userResponseDto');
 const authService = require("../services/authService");
 const RegisterUserDto = require('../dtos/User/registerUserDto');
 
-/** 회원가입 */
-exports.registerUser = async (req, res, next) => {
-    try {
-        const firebaseUid = req.body.uid;
-        const email = req.body.email; 
-        const { name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img } = req.body;
-``
-        const registerDto = new RegisterUserDto(firebaseUid,email,name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img );
 
-        const { userProfile, created } = await UserService.registerUser(registerDto);
-
-        if (created) {
-            res.status(201).json({
-                message: '회원가입이 완료 되었습니다.',
-                userProfile: new UserResponseDto(userProfile)
-            });
-        } else {
-            res.status(200).json({ 
-                message: '이미 존재하는 유저입니다. 새로운 회원가입은 이루어지지 않았습니다.', 
-                userProfile: new UserResponseDto(userProfile)
-            });
-        }
-    } catch (error) {
-        console.error("회원가입 에러: ", error);
-        res.status(500).json({
-            message: error.message || '서버 에러'
-        });
-    }
-};
 
 /** 사용자 프로필 조회 */ 
 exports.getUserProfile = async (req, res, next) => {
