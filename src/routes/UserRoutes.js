@@ -7,7 +7,7 @@ const { route } = require('./authRoutes');
 /**
  * @swagger
  * tags:
- *   name: Users
+ *   name: user
  *   description: 사용자 정보 관련 API
  */
 
@@ -18,7 +18,7 @@ const { route } = require('./authRoutes');
  * /api/users/profile:
  *   get:
  *     summary: 사용자 프로필 조회
- *     tags: [Users]
+ *     tags: [user]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -42,7 +42,7 @@ const { route } = require('./authRoutes');
  *         description: 서버 에러
  *   put:
  *     summary: 사용자 프로필 업데이트
- *     tags: [Users]
+ *     tags: [user]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -103,7 +103,7 @@ router.put(
  * /api/users/profile/diseases:
  *   get:
  *     summary: 사용자 기저질환 조회
- *     tags: [Users]
+ *     tags: [user]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -140,7 +140,7 @@ router.get('/profile/diseases',verifyToken,UserController.getUserDiseases);
  * /api/users/profile/diseases/{disease_id}:
  *   get:
  *     summary: 특정 기저질환에 대한 금기 약물 정보 조회
- *     tags: [Users]
+ *     tags: [user]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -184,7 +184,7 @@ router.get('/profile/diseases/:disease_id', verifyToken, UserController.getUserP
  * /api/users/withdraw:
  *   delete:
  *     summary: 사용자 탈퇴
- *     tags: [Users]
+ *     tags: [user]
  *     security:
  *       - bearerAuth: []
  *     responses:

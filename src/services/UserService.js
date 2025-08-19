@@ -3,30 +3,99 @@ const User = require('../models/user');
 const User_Disease = require('../models/user_disease');
 const Disease = require('../models/disease');
 const DUR_chronic = require('../models/dur_chronic');
+const User_Medi_History = require('../models/user_medi_history');
 const { Translate } = require('@google-cloud/translate').v2;
 const redisClient = require('../config/redisClient');
 const translate = new Translate();
 
 class UserService {
-
+    
+    /** 텍스트 번역 */
+    async translateWithCache(text, targetLanguage) { 
+        const cacheKey = `translate:${targetLanguage}:${text}`;
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+        const [translated] = await translate.translate(text, targetLanguage);
+        await redisClient.set(cacheKey, translated, 'EX', 604800); // 7일 동안 캐시
+        return translated;
+    };
+    
     
     /** 회원가입 */
-    async registerUser(firebaseUid,email,registerDto){
-            try{
-                const existingUser = await User.findByPk(firebaseUid);
+    async registerUser(registerDto){
+        try{
+                const existingUser = await User.findByPk(registerDto.firebaseUid);
     
                 if(existingUser){
                     return { userProfile: existingUser, created: false };
                 }
                 const newUser = await User.create({
                     user_id: firebaseUid,
-                    email: email,
+                    email: registerDto.email,
                     user_name: registerDto.username,
+                    nickname: registerDto.nickname,
+                    gender: registerDto.gender,
+                    birthday: registerDto.birthday,
                     phone: registerDto.phone,
-                    country: registerDto.country
+                    region: registerDto.residence,
+                    country: registerDto.country,
+                    user_img : registerDto.img || null,
                 });
-
-
+                // 기저질환 관계 설정
+                if (registerDto.disease_ids && registerDto.disease_ids.length > 0)
+                {
+                    const userDiseaseData = registerDto.disease_ids.map(disease_id => ({
+                        user_id: newUser.user_id,
+                        disease_id: disease_id
+                    }));
+                    await User_Disease.bulkCreate(userDiseaseData);
+                }
+                // 사용자 메디 히스토리 관계 설정
+                for (const h of registerDto.history) {
+                    let krMediId = null;
+                    let customName = null;
+                
+                    if (h.medi_name) {
+                        const medi = await Kr_Medi.findOne({ where: { medi_name: h.medi_name } });
+                        if (medi) {
+                            krMediId = medi.kr_medi_id;
+                        } else {
+                            customName = h.medi_name; // DB에 없는 약은 custom_name에 저장
+                        }
+                    }
+                
+                    await User_Medi_History.create({
+                        user_id: newUser.user_id,
+                        kr_medi_id: krMediId,
+                        custom_name: customName,
+                        start_date: h.start_date,
+                        end_date: h.end_date || null,
+                        status: h.status || '복용 중',
+                        dosage: h.dosage || null
+                    });
+                }
+                
+                // 사용자 프로필 반환
+                newUser.Diseases = await Disease.findAll({
+                    include: [{
+                        model: User_Disease,
+                        as: 'User_Diseases',
+                        where: { user_id: newUser.user_id },
+                        attributes: []
+                    }],
+                    attributes: ['disease_id', 'disease_name']
+                });
+                newUser.User_Medi_History = await User_Medi_History.findAll({
+                    where: { user_id: newUser.user_id },
+                    attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
+                    include: [{
+                        model: Kr_Medi,
+                        as: 'kr_medi',
+                        required: false // kr_medi가 없는 경우도 처리
+                    }]
+                });
                 return {User : newUser , created: true};
             }
             catch(error){
@@ -34,18 +103,6 @@ class UserService {
                 throw new Error(`회원가입 실패 : ${error.message}`)
             }
         };
-    /** 텍스트 번역 */
-    async translateWithCache(text, targetLanguage) {
-        const cacheKey = `translate:${targetLanguage}:${text}`;
-        const cached = await redisClient.get(cacheKey);
-        if (cached) {
-            return cached;
-        }
-
-        const [translated] = await translate.translate(text, targetLanguage);
-        await redisClient.set(cacheKey, translated, 'EX', 604800); // 7일 동안 캐시
-        return translated;
-    };    
 
    
 
