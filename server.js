@@ -21,8 +21,7 @@ async function startServer() {
 
         console.log('모델 관계 설정 완료.');
 
-
-        // 4. Express 서버 시작
+        // 3. Express 서버 시작
         app.listen(PORT,HOST, () => {
             console.log(`Server running on port ${PORT}`);
             console.log(`Access URL: http://localhost:${PORT}`);

@@ -7,7 +7,7 @@ const upload = multer({ dest: 'uploads/' });
 /**
  * @swagger
  * tags:
- *   name: Translate
+ *   name: translate
  *   description: 번역 관련 API
  */
 
@@ -19,7 +19,7 @@ const upload = multer({ dest: 'uploads/' });
  * /api/translate:
  *   post:
  *     summary: 통합 번역 (음성, 텍스트, 이미지)
- *     tags: [Translate]
+ *     tags: [translate]
  *     requestBody:
  *       required: true
  *       content:

@@ -8,10 +8,10 @@ const RegisterUserDto = require('../dtos/User/registerUserDto');
 exports.registerUser = async (req, res, next) => {
     try {
         const firebaseUid = req.body.uid;
-        const email = req.user.email; 
-        const { username,nickname ,phone, country,residence,gender,birthday,disease_ids } = req.body;
+        const email = req.body.email; 
+        const { name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img } = req.body;
 ``
-        const registerDto = new RegisterUserDto(firebaseUid,email,username,nickname ,phone, country,residence,gender,birthday,disease_ids );
+        const registerDto = new RegisterUserDto(firebaseUid,email,name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img );
 
         const { userProfile, created } = await UserService.registerUser(registerDto);
 
@@ -37,7 +37,7 @@ exports.registerUser = async (req, res, next) => {
 /** 사용자 프로필 조회 */ 
 exports.getUserProfile = async (req, res, next) => {
     try {
-        const firebaseUid = req.user.uid;
+        const firebaseUid = req.body.uid;
         const user = await UserService.getUserProfile(firebaseUid);
         res.status(200).json({
             message: '사용자 정보 조회 성공',
@@ -54,7 +54,7 @@ exports.getUserProfile = async (req, res, next) => {
 /** 사용자 기저질환 조회 */ 
 exports.getUserDiseases = async (req, res) => {
     try {
-        const firebaseUid = req.user.uid;
+        const firebaseUid = req.body.uid;
         const diseases = await UserService.getUserDiseases(firebaseUid);
         res.status(200).json({
             message: '사용자 기저질환 조회 성공',
