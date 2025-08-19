@@ -11,19 +11,24 @@ class UserService {
 
     
     /** 회원가입 */
-    async registerUser(firebaseUid,email,registerDto){
+    async registerUser(registerDto){
             try{
-                const existingUser = await User.findByPk(firebaseUid);
+                const existingUser = await User.findByPk(registerDto.firebaseUid);
     
                 if(existingUser){
                     return { userProfile: existingUser, created: false };
                 }
                 const newUser = await User.create({
                     user_id: firebaseUid,
-                    email: email,
+                    email: registerDto.email,
                     user_name: registerDto.username,
+                    nickname: registerDto.nickname,
+                    gender: registerDto.gender,
+                    birthday: registerDto.birthday,
                     phone: registerDto.phone,
-                    country: registerDto.country
+                    region: registerDto.residence,
+                    country: registerDto.country,
+                    user_img : registerDto.img || null,
                 });
 
 

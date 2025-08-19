@@ -7,13 +7,13 @@ const RegisterUserDto = require('../dtos/User/registerUserDto');
 /** 회원가입 */
 exports.registerUser = async (req, res, next) => {
     try {
-        const firebaseUid = req.user.uid;
+        const firebaseUid = req.body.uid;
         const email = req.user.email; 
-        const { username,nickname ,phone, country,region,gender,birthday,disease_ids } = req.body;
+        const { username,nickname ,phone, country,residence,gender,birthday,disease_ids } = req.body;
 ``
-        const registerDto = new RegisterUserDto( username,nickname ,phone, country,region,gender,birthday,disease_ids );
+        const registerDto = new RegisterUserDto(firebaseUid,email,username,nickname ,phone, country,residence,gender,birthday,disease_ids );
 
-        const { userProfile, created } = await authService.registerUser(firebaseUid, email, registerDto);
+        const { userProfile, created } = await UserService.registerUser(registerDto);
 
         if (created) {
             res.status(201).json({

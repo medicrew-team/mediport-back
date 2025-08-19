@@ -1,8 +1,6 @@
 const authService = require('../services/authService'); 
 const RegisterUserDto = require('../dtos/User/registerUserDto');
 const UserResponseDto = require('../dtos/auth/userResponseDto');
-const UpdateProfileDto = require('../dtos/User/updateProfileDto');
-
 
 exports.loginUser = async (req, res, next) => {
     try {

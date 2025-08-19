@@ -84,6 +84,9 @@ router.post('/logout', verifyToken, authController.logoutUser);
  *           schema:
  *             type: object
  *             properties:
+ *               firebaseUid:
+ *                 type: string
+ *                 example: "firebase-uid-12345"
  *               email:
  *                 type: string
  *                 format: email
@@ -94,16 +97,25 @@ router.post('/logout', verifyToken, authController.logoutUser);
  *               username:
  *                 type: string
  *                 example: "testuser"
- *               phone:
+ *               nickname:
  *                 type: string
- *                 example: "010-1234-5678"
+ *                 example: "테스트유저"
+ *               gender:
+ *                 type: string
+ *                 example: "MALE"
+ *               birthday:
+ *                 type: string
+ *                 format: date
+ *                 example: "1990-01-01"
  *               country:
  *                 type: string
  *                 example: "South Korea"
- *               region:
- *               region:
+ *               residence:
  *                 type: string
  *                 example: "Seoul"
+ *               phone:
+ *                 type: string
+ *                 example: "010-1234-5678"
  *               disease_ids:
  *                 type: array
  *                 items:
