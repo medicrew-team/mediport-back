@@ -103,3 +103,47 @@ exports.parseImage = async( file, target_lang='ko' ) => {
 
 
 
+exports.parseText = async ( text, target_lang='ko' ) => {
+    if ( !text ) throw new Error('text is required');
+
+    try{
+        const [result] = await db.execute(query.parseText, { text: text });
+
+        let dataToProcess = result;
+        if (Array.isArray(result) && Array.isArray(result[0])) {
+            console.log('Extracting first array from nested result');
+            dataToProcess = result[0]; // 의약품 객체 배열 추출
+        } else if (!Array.isArray(dataToProcess)) {
+            console.warn('Result is not an array, converting to array:', dataToProcess);
+            dataToProcess = [dataToProcess];
+        }
+        // 한국어 요청 시 원본 반환
+        if (target_lang !=='ko') {
+        
+        // 번역 처리
+        const translatedData = await Promise.all(dataToProcess.map(async (item) => {
+            const translatedItem = { ...item };
+
+            translatedItem.prod_name = await exports.translateWithCache(item.prod_name, target_lang);
+            translatedItem.medi_form = await exports.translateWithCache(item.medi_form, target_lang);
+            translatedItem.icd_sum = await exports.translateWithCache(item.icd_sum, target_lang);
+            translatedItem.dosage = await exports.translateWithCache(item.dosage, target_lang);
+            translatedItem.purchase_loc = await exports.translateWithCache(item.purchase_loc, target_lang);
+
+            return translatedItem;
+        }));
+        
+        return translatedData;
+        }
+        return dataToProcess;
+        
+    } catch (error) {
+    if (error.response) {
+      console.error('status:', error.response.status, 'data:', error.response.data);
+      throw new Error(`Upstream error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+    } else {
+      console.error('network:', error.message);
+      throw new Error('Upstream connection error');
+    }
+  }
+};

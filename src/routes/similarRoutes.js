@@ -105,7 +105,66 @@ const upload = multer({
  */
 router.post('/foreign-medicine/image', upload.single('file'), similarController.parseImage)
 
-
+/**
+ * @swagger
+ * /similar/foreign-medicine/text:
+ *   post:
+ *     summary: 텍스트 입력 후 처리 결과 반환
+ *     tags: [Similar]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - text
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 description: 처리할 텍스트 입력
+ *                 example: "开瑞坦"
+ *     responses:
+ *       200:
+ *         description: 텍스트 처리 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 text:
+ *                   type: string
+ *                   description: 처리된 텍스트 결과
+ *                   example: "开瑞坦"
+ *                 provider:
+ *                   type: string
+ *                   example: text
+ *       400:
+ *         description: 잘못된 요청 (텍스트 누락)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: text 필드가 필요합니다.
+ *       401:
+ *         description: 인증 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 유효하지 않거나 만료된 토큰입니다.
+ *       500:
+ *         description: 서버 오류
+ */
+router.post('/foreign-medicine/text', similarController.parseText)
 
 
 module.exports = router;
