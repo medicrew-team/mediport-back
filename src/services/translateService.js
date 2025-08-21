@@ -69,7 +69,7 @@ async function textToSpeechAndSave(text, targetLanguage) {
     const request = {
         input: { text: text },
         voice: { languageCode: languageCode, ssmlGender: 'FEMALE' },
-        audioConfig: { audioEncoding: 'MP3' },
+        audioConfig: { audioEncoding: 'MP3' , volumeGainDb: 16.0 },
     };
 
     try {
