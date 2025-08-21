@@ -1,6 +1,11 @@
-//
-const getBoardById = 
-`SELECT * FROM Board WHERE board_id = :boardId AND category = :category order by created_at ASC`;
+// 쿼리문 정의
+const getBoardById = `
+  SELECT * 
+  FROM Board 
+  WHERE board_id = :boardId 
+    AND category = :category 
+  ORDER BY created_at ASC
+`;
 
 const parseImage = `
   SELECT distinct km.prod_name,
@@ -34,6 +39,7 @@ const parseText = `
   WHERE im.prod_name = :text COLLATE utf8mb4_general_ci;
 `;
 
+
 const parseKrImage = `
   SELECT prod_name,
          medi_form,
@@ -44,6 +50,7 @@ const parseKrImage = `
   FROM kr_medi
   WHERE prod_name COLLATE utf8mb4_general_ci IN (?);
 `;
+
 
 
 // CommonJS 방식으로 내보내기
