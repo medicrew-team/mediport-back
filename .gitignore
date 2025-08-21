@@ -13,3 +13,5 @@ frontend/
 redis.conf
 
 *.sql
+
+src/routes/uploads
