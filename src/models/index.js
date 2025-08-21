@@ -37,6 +37,13 @@ function setupAssociations() {
     user.belongsToMany(kr_medi, { through: user_medi_history, foreignKey: 'user_id' });
     kr_medi.belongsToMany(user, { through: user_medi_history, foreignKey: 'kr_medi_id' });
 
+    // User ↔ UserMediHistory (1:N)
+    user.hasMany(user_medi_history, { foreignKey: 'user_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+    user_medi_history.belongsTo(user, { foreignKey: 'user_id' });
+
+    // Kr_medi ↔ UserMediHistory (1:N)
+    kr_medi.hasMany(user_medi_history, { foreignKey: 'kr_medi_id', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
+    user_medi_history.belongsTo(kr_medi, { foreignKey: 'kr_medi_id' });
 
     // user와 disease의 다대다 관계 설정
     user.belongsToMany(disease, { through: user_disease, foreignKey: 'user_id', as: 'Diseases' });

@@ -6,7 +6,7 @@ const { verifyToken } = require('../middleware/authMiddleware');
 /**
  * @swagger
  * tags:
- *   name: Boards
+ *   name: board
  *   description: 게시판 정보 관련 API
  */
 
@@ -16,7 +16,7 @@ const { verifyToken } = require('../middleware/authMiddleware');
  * /api/boards:
  *   get:
  *     summary: 모든 게시글 조회
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -34,7 +34,7 @@ const { verifyToken } = require('../middleware/authMiddleware');
  * /api/boards:
  *   get:
  *     summary: 모든 게시글 조회
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -53,7 +53,7 @@ router.get('/',verifyToken ,boardController.getBoards);
  * /api/boards:
  *   post:
  *     summary: 새 게시글 생성
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -77,7 +77,7 @@ router.get('/',verifyToken ,boardController.getBoards);
  * /api/boards:
  *   post:
  *     summary: 새 게시글 생성
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -104,7 +104,7 @@ router.post('/', verifyToken, boardController.createBoard);
  * /api/boards/{boardId}:
  *   get:
  *     summary: 특정 게시글 조회
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -129,7 +129,7 @@ router.post('/', verifyToken, boardController.createBoard);
  * /api/boards/{boardId}:
  *   get:
  *     summary: 특정 게시글 조회
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -155,7 +155,7 @@ router.get('/:boardId',verifyToken ,boardController.getBoardById);
  * /api/boards/{boardId}:
  *   put:
  *     summary: 특정 게시글 업데이트
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -188,7 +188,7 @@ router.get('/:boardId',verifyToken ,boardController.getBoardById);
  * /api/boards/{boardId}:
  *   put:
  *     summary: 특정 게시글 업데이트
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -222,7 +222,7 @@ router.put('/:boardId', verifyToken, boardController.updateBoard);
  * /api/boards/{boardId}:
  *   delete:
  *     summary: 특정 게시글 삭제
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -246,7 +246,7 @@ router.delete('/:boardId', verifyToken, boardController.deleteBoard);
  * /api/boards/{boardId}/comments:
  *   post:
  *     summary: 게시글에 댓글 추가
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -288,7 +288,7 @@ router.post('/:boardId/comments', verifyToken, boardController.createComment);
  * /api/boards/{boardId}/comments/{commentId}:
  *   put:
  *     summary: 특정 댓글 업데이트
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -334,7 +334,7 @@ router.put('/:boardId/comments/:commentId', verifyToken, boardController.updateC
  * /api/boards/{boardId}/comments/{commentId}:
  *   delete:
  *     summary: 특정 댓글 삭제
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -364,7 +364,7 @@ router.delete('/:boardId/comments/:commentId', verifyToken, boardController.dele
  * /api/boards/{boardId}/likes:
  *   post:
  *     summary: 게시글 좋아요/좋아요 취소
- *     tags: [Boards]
+ *     tags: [board]
  *     security:
  *       - bearerAuth: []
  *     parameters:

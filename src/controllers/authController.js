@@ -1,47 +1,18 @@
-const authService = require('../services/authService'); 
+const authService = require('../services/authService');
+const UserService = require('../services/UserService');
 const RegisterUserDto = require('../dtos/User/registerUserDto');
 const UserResponseDto = require('../dtos/auth/userResponseDto');
-const UpdateProfileDto = require('../dtos/User/updateProfileDto');
 
-
-exports.loginUser = async (req, res, next) => {
-    try {
-        const firebaseUid = req.user.uid;
-        const user = await authService.loginUser(firebaseUid);
-        res.status(200).json({
-            message: '로그인 성공',
-            user: new UserResponseDto(user)
-        });
-    } catch (error) {
-        console.error("로그인 에러: ", error);
-        res.status(404).json({ // 사용자를 찾지 못한 경우 404 Not Found
-            message: error.message || '서버 에러'
-        });
-    }
-};
-
-exports.logoutUser = async (req, res, next) => {
-    try {
-        const firebaseUid = req.user.uid;
-        const result = await authService.logoutUser(firebaseUid);
-        res.status(200).json(result);
-    } catch (error) {
-        console.error("로그아웃 에러: ", error);
-        res.status(500).json({
-            message: error.message || '서버 에러'
-        });
-    }
-};
-
+/** 회원가입 */
 exports.registerUser = async (req, res, next) => {
     try {
-        const firebaseUid = req.user.uid;
-        const email = req.user.email; 
-        const { username, phone, country, disease_ids } = req.body;
+        const firebaseUid = req.body.uid;
+        const email = req.body.email; 
+        const { name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img } = req.body;
+``
+        const registerDto = new RegisterUserDto(firebaseUid,email,name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img );
 
-        const registerDto = new RegisterUserDto(username, phone, country, disease_ids);
-
-        const { userProfile, created } = await authService.registerUser(firebaseUid, email, registerDto);
+        const { userProfile, created } = await UserService.registerUser(registerDto);
 
         if (created) {
             res.status(201).json({
@@ -61,4 +32,34 @@ exports.registerUser = async (req, res, next) => {
         });
     }
 };
+
+exports.loginUser = async (req, res, next) => {
+    try {
+        const firebaseUid = req.body.uid;
+        const user = await authService.loginUser(firebaseUid);
+        res.status(200).json({
+            message: '로그인 성공',
+            user: new UserResponseDto(user)
+        });
+    } catch (error) {
+        console.error("로그인 에러: ", error);
+        res.status(404).json({ // 사용자를 찾지 못한 경우 404 Not Found
+            message: error.message || '서버 에러'
+        });
+    }
+};
+
+exports.logoutUser = async (req, res, next) => {
+    try {
+        const firebaseUid = req.body.uid;
+        const result = await authService.logoutUser(firebaseUid);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("로그아웃 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};
+
 

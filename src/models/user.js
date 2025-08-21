@@ -41,6 +41,10 @@ const User = sequelize.define('user', {
     type: DataTypes.STRING(50),
     allowNull: true
   },
+  user_img: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,

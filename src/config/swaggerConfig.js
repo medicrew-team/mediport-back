@@ -15,6 +15,24 @@ const options = {
         url: "http://localhost:3000", // 요청 URL
       },
     ],
+    tags: [
+      {
+        name: 'authentication',
+        description: 'Authentication related APIs',
+      },
+      {
+        name: 'user',
+        description: 'User related APIs',
+      },
+      {
+        name: 'board',
+        description: 'Board related APIs',
+      },
+      {
+        name: 'translate',
+        description: 'Translation related APIs',
+      }
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -38,6 +56,19 @@ const options = {
               type: 'array',
               items: {
                 type: 'integer'
+              }
+            },
+            history: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  medi_name: { type: 'string' },
+                  start_date: { type: 'string', format: 'date' },
+                  end_date: { type: 'string', format: 'date' },
+                  status: { type: 'string' },
+                  dosage: { type: 'string' }
+                }
               }
             }
           },

@@ -2,8 +2,9 @@ const boardService = require('../services/BoardService');
 const CreateBoardDto = require('../dtos/Board/CreateBoardDto');
 const UpdateBoardDto = require('../dtos/Board/UpdateBoardDto');
 const BoardResponseDto = require('../dtos/Board/BoardResponseDto');
-const UserResponseDto = require('../dtos/auth/userResponseDto'); // 작성자 정보 DTO
+const authorDto = require('../dtos/Board/authorDto'); // 작성자 정보 DTO
 const CommentResponseDto = require('../dtos/Board/CommentResponseDto'); // 댓글 응답 DTO
+
 
 class BoardController {
     async createBoard(req, res, next) {
@@ -21,7 +22,7 @@ class BoardController {
 
             res.status(201).json({
                 message: '게시글이 성공적으로 생성되었습니다.',
-                board: new BoardResponseDto(newBoard, new UserResponseDto(req.user)) // 작성자 정보 포함
+                board: new BoardResponseDto(newBoard, new authorDto(req.user)) // 작성자 정보 포함
             });
         } catch (error) {
             console.error("게시글 생성 에러: ", error);
@@ -41,7 +42,7 @@ class BoardController {
             const { count, rows } = await boardService.getBoards(page, limit, search, category);
 
             const boardsResponse = rows.map(board => {
-                const author = board.User ? new UserResponseDto(board.User) : null;
+                const author = board.User ? new authorDto(board.User) : null;
                 const commentCount = board.dataValues.commentCount || 0;
                 const likeCount = board.dataValues.likeCount || 0;
                 return new BoardResponseDto(board, author, commentCount, likeCount);
@@ -67,10 +68,10 @@ class BoardController {
             const { boardId } = req.params;
             const { category } = req.query; 
             const board = await boardService.getBoardById(boardId,category);
-            const author = board.User ? new UserResponseDto(board.User) : null;
+            const author = board.User ? new authorDto(board.User) : null;
             const commentCount = board.Comments ? board.Comments.length : 0;
             const likeCount = board.Likes ? board.Likes.length : 0;
-            const comments = board.Comments ? board.Comments.map(comment => new CommentResponseDto(comment, comment.User ? new UserResponseDto(comment.User) : null)) : [];
+            const comments = board.Comments ? board.Comments.map(comment => new CommentResponseDto(comment, comment.User ? new authorDto(comment.User) : null)) : [];
 
             const boardResponse = new BoardResponseDto(board, author, commentCount, likeCount, comments);
             console.log("게시글 상세 조회 성공: ", boardResponse);
@@ -104,7 +105,7 @@ class BoardController {
 
             res.status(200).json({
                 message: '게시글이 성공적으로 수정되었습니다.',
-                board: new BoardResponseDto(updatedBoard, new UserResponseDto(req.user)) // 수정 후 작성자 정보 포함
+                board: new BoardResponseDto(updatedBoard, new authorDto(req.user)) // 수정 후 작성자 정보 포함
             });
         } catch (error) {
             console.error("게시글 수정 에러: ", error);
@@ -147,7 +148,7 @@ class BoardController {
             const newComment = await boardService.createComment(boardId, userId, content);
 
             // CommentResponseDto 적용
-            const author = req.user ? new UserResponseDto(req.user) : null; // req.user는 Firebase decoded token
+            const author = req.user ? new authorDto(req.user) : null; // req.user는 Firebase decoded token
             res.status(201).json({
                 message: '댓글이 성공적으로 생성되었습니다.',
                 comment: new CommentResponseDto(newComment, author)
@@ -173,7 +174,7 @@ class BoardController {
             const updatedComment = await boardService.updateComment(boardId, commentId, userId, content);
 
             // CommentResponseDto 적용
-            const author = req.user ? new UserResponseDto(req.user) : null; // req.user는 Firebase decoded token
+            const author = req.user ? new authorDto(req.user) : null; // req.user는 Firebase decoded token
             res.status(200).json({
                 message: '댓글이 성공적으로 수정되었습니다.',
                 comment: new CommentResponseDto(updatedComment, author)
