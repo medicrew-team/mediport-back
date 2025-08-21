@@ -4,6 +4,7 @@ const User_Disease = require('../models/user_disease');
 const Disease = require('../models/disease');
 const DUR_chronic = require('../models/dur_chronic');
 const User_Medi_History = require('../models/user_medi_history');
+const KrMedi = require('../models/kr_medi');
 const { Translate } = require('@google-cloud/translate').v2;
 const redisClient = require('../config/redisClient');
 const translate = new Translate();
@@ -42,6 +43,7 @@ class UserService {
                     region: registerDto.residence,
                     country: registerDto.country,
                     user_img : registerDto.img || null,
+                    language : registerDto.language || 'ko' // 기본 언어는 한국어
                 });
                 // 기저질환 관계 설정
                 if (registerDto.disease_ids && registerDto.disease_ids.length > 0)
@@ -105,6 +107,73 @@ class UserService {
         };
 
    
+        /**
+     * 사용자의 모든 복약 기록을 조회합니다.
+     * kr_medi_id가 없는 경우 custom_name을 사용하고, kr_medi 정보는 null로 처리합니다.
+     */
+    async getMedicationHistory(userId) {
+        try {
+            const medicationHistory = await User_Medi_History.findAll({
+                where: { user_id: userId },
+                include: [{
+                    model: KrMedi,
+                    required: false // LEFT JOIN
+                }],
+                order: [['start_date', 'DESC']] // 최신 기록부터 정렬
+            });
+            return medicationHistory;
+        } catch (error) {
+            console.error('사용자 복약 기록 조회 에러:', error);
+            throw new Error(`사용자 복약 기록 조회 실패: ${error.message}`);
+        }
+    }
+
+    /**
+     * 특정 복약 기록의 상세 정보를 조회합니다.
+     * kr_medi_id가 없는 경우 custom_name을 사용하고, kr_medi 정보는 null로 처리합니다.
+     */
+    async getMedicationHistoryDetail(historyId) {
+        try {
+            const medicationDetail = await User_Medi_History.findByPk(historyId, {
+                include: [{
+                    model: KrMedi,
+                    required: false // LEFT JOIN
+                }]
+            });
+
+            if (!medicationDetail) {
+                throw new Error('복약 기록을 찾을 수 없습니다.');
+            }
+            return medicationDetail;
+        } catch (error) {
+            console.error('복약 기록 상세 조회 에러:', error);
+            throw new Error(`복약 기록 상세 조회 실패: ${error.message}`);
+        }
+    }
+
+    /** 사용자 프로필 조회 */ 
+    async getUserProfile(firebaseUid) {
+            try {
+                const user = await User.findByPk(firebaseUid,{
+                    include: [{
+                        model: Disease,
+                        as: 'Diseases',
+                        attributes: ['disease_id', 'disease_name'],
+                        through: { attributes: [] } // 연결 테이블의 속성은 필요 없으므로 비워둠
+                    }, {
+                        model : User_Medi_History,
+                        as: 'User_Medi_History'
+                    }]
+                });
+                if (!user) {
+                    throw new Error('사용자를 찾을 수 없습니다.');
+                }
+                return user;
+            } catch (error) {
+                console.error('사용자 프로필 조회 에러 : ', error);
+                throw new Error(`사용자 프로필 조회 실패: ${error.message}`);
+            }
+        }
 
     /** 사용자 정보 업데이트 */
     async updateUser(firebaseUid, updateDto) {
@@ -115,8 +184,18 @@ class UserService {
                 throw new Error('사용자를 찾을 수 없습니다.');
             }
 
+            const existingNickname = await User.findOne({
+                where: { nickname: updateDto.nickname },
+                attributes: ['user_id']
+            });
+            if( existingNickname && existingNickname.user_id !== firebaseUid) {
+                throw new Error('이미 사용 중인 닉네임입니다.');
+            }
+
             // 사용자 기본 정보 업데이트
             user.phone = updateDto.phone || user.phone;
+            user.language = updateDto.language || user.language; // 언어 정보 업데이트
+            user.img = updateDto.img || user.user_img; // 프로필 이미지 업데이트
             await user.save();
 
             // 기저질환 정보 업데이트 (기존 삭제 후 새로 생성)
@@ -147,37 +226,57 @@ class UserService {
                     where: { user_id: firebaseUid }
                 });
             }
-
-            // 업데이트된 사용자 정보 반환 (기저질환 포함)
-            const updatedUserWithDiseases = await this.getUserProfile(firebaseUid);
-            return updatedUserWithDiseases;
+            // 사용자 메디 히스토리 업데이트 (기존 삭제 후 새로 생성)
+            await User_Medi_History.destroy({
+                where: { user_id: firebaseUid }
+            });
+            for (const h of updateDto.history) {
+                let krMediId = null;
+                let customName = null;
+                if (h.medi_name) {
+                    const krMedi = await Kr_Medi.findOne({ 
+                    where: { medi_name: h.medi_name } });
+                    if (krMedi) {
+                        krMediId = krMedi.kr_medi_id;
+                    } else {
+                        customName = h.medi_name; // DB에 없는 약은 custom_name에 저장
+                    }
+                }
+                await User_Medi_History.create({
+                    user_id: firebaseUid,
+                    kr_medi_id: krMediId,
+                    custom_name: customName,
+                    start_date: h.start_date,
+                    end_date: h.end_date || null,
+                    status: h.status || '복용 중',
+                    dosage: h.dosage || null
+                });
+            }
+            // 사용자 프로필 반환
+            user.Diseases = await Disease.findAll({
+                include: [{
+                    model: User_Disease,
+                    as: 'User_Diseases',
+                    where: { user_id: firebaseUid },
+                    attributes: []
+                }],
+                attributes: ['disease_id', 'disease_name']
+            });
+            user.User_Medi_History = await User_Medi_History.findAll({
+                where: { user_id: firebaseUid },
+                attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
+                include: [{
+                    model: Kr_Medi,
+                    as: 'kr_medi',
+                    required: false // kr_medi가 없는 경우도 처리
+                }]
+            });
+            // 사용자 프로필 반환
+            return user;
 
         } catch (error) {
             console.error('사용자 정보 업데이트 에러 : ', error);
             throw new Error(`사용자 정보 업데이트 실패: ${error.message}`);
-        }
-    }
-    /** 사용자 프로필 조회 */ 
-    async getUserProfile(firebaseUid) {
-        try {
-            const user = await User.findByPk(firebaseUid,{
-                include: [{
-                    model: Disease,
-                    as: 'Diseases',
-                    attributes: ['disease_id', 'disease_name'],
-                    through: { attributes: [] } // 연결 테이블의 속성은 필요 없으므로 비워둠
-                }, {
-                    model : User_Medi_History,
-                    as: 'User_Medi_History'
-                }]
-            });
-            if (!user) {
-                throw new Error('사용자를 찾을 수 없습니다.');
-            }
-            return user;
-        } catch (error) {
-            console.error('사용자 프로필 조회 에러 : ', error);
-            throw new Error(`사용자 프로필 조회 실패: ${error.message}`);
         }
     }
 
@@ -224,6 +323,7 @@ class UserService {
             throw new Error(`사용자 기저질환 금기약품 조회 실패: ${error.message}`);
         }
     }
+
     /** 금기약품 상세정보 조회 */
     async getProhibitMediDetail(prod_name, target_lang = 'ko') {
         try {
@@ -243,6 +343,7 @@ class UserService {
             throw new Error(`금기약품 상세정보 조회 실패: ${error.message}`);
         }
     };
+
     /** 회원 탈퇴 */
     async deleteUser(firebaseUid) {
         try {

@@ -42,38 +42,6 @@ const options = {
         },
       },
       schemas: {
-        CreateUserDto: {
-          type: 'object',
-          properties: {
-            username: { type: 'string' },
-            nickname: { type: 'string' },
-            phone: { type: 'string' },
-            country: { type: 'string' },
-            region: { type: 'string' },
-            gender: { type: 'string' },
-            birthday: { type: 'string', format: 'date' },
-            disease_ids: {
-              type: 'array',
-              items: {
-                type: 'integer'
-              }
-            },
-            history: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  medi_name: { type: 'string' },
-                  start_date: { type: 'string', format: 'date' },
-                  end_date: { type: 'string', format: 'date' },
-                  status: { type: 'string' },
-                  dosage: { type: 'string' }
-                }
-              }
-            }
-          },
-          required: ['username', 'nickname', 'phone', 'country', 'region', 'gender', 'birthday'],
-        },
         UpdateProfileDto: {
           type: 'object',
           properties: {
@@ -87,31 +55,6 @@ const options = {
               }
             }
           }
-        },
-        UserResponseDto: {
-          type: 'object',
-          properties: {
-            userId: { type: 'string' },
-            email: { type: 'string', format: 'email' },
-            username: { type: 'string' },
-            nickname: { type: 'string' },
-            gender: { type: 'string' },
-            birthday: { type: 'string', format: 'date' },
-            region: { type: 'string' },
-            phone: { type: 'string' },
-            country: { type: 'string' },
-            createdAt: { type: 'string', format: 'date-time' },
-            diseases: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  id: { type: 'integer' },
-                  name: { type: 'string' },
-                },
-              },
-            },
-          },
         },
         CreateBoardDto: {
           type: 'object',
@@ -139,7 +82,7 @@ const options = {
             view: { type: 'integer' },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
-            author: { '$ref': '#/components/schemas/UserResponseDto' },
+            author: { '$ref': '#/components/schemas/authorDto' },
             commentCount: { type: 'integer' },
             likeCount: { type: 'integer' },
             comments: {
@@ -157,7 +100,17 @@ const options = {
             content: { type: 'string' },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
-            author: { '$ref': '#/components/schemas/UserResponseDto' }
+            author: { '$ref': '#/components/schemas/authorDto' }
+          }
+        },
+        authorDto: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            nickname: { type: 'string' },
+            profileImage: { type: 'string', format: 'uri' },
+            country: { type: 'string' },
+            region: { type: 'string' }
           }
         }
       },

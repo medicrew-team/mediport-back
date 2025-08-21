@@ -8,9 +8,9 @@ exports.registerUser = async (req, res, next) => {
     try {
         const firebaseUid = req.body.uid;
         const email = req.body.email; 
-        const { name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img } = req.body;
+        const { name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img,language } = req.body;
 ``
-        const registerDto = new RegisterUserDto(firebaseUid,email,name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img );
+        const registerDto = new RegisterUserDto(firebaseUid,email,name,nickname ,phone, country,residence,gender,birthday,disease_ids,history,img,language);
 
         const { userProfile, created } = await UserService.registerUser(registerDto);
 
