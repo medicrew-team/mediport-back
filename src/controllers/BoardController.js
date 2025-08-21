@@ -19,11 +19,13 @@ class BoardController {
             }
 
             const newBoard = await boardService.createBoard(userId, createBoardDto);
+            const boardResponse = new BoardResponseDto(newBoard, new authorDto(req.user)); // 작성자 정보 포함
 
             res.status(201).json({
                 message: '게시글이 성공적으로 생성되었습니다.',
-                board: new BoardResponseDto(newBoard, new authorDto(req.user)) // 작성자 정보 포함
+                board: boardResponse
             });
+            console.log("게시글 생성 성공: ", boardResponse);
         } catch (error) {
             console.error("게시글 생성 에러: ", error);
             res.status(500).json({
@@ -55,6 +57,7 @@ class BoardController {
                 currentPage: page,
                 boards: boardsResponse
             });
+            console.log("게시글 목록 조회 성공: ", boardsResponse);
         } catch (error) {
             console.error("게시글 목록 조회 에러: ", error);
             res.status(500).json({
@@ -74,13 +77,12 @@ class BoardController {
             const comments = board.Comments ? board.Comments.map(comment => new CommentResponseDto(comment, comment.User ? new authorDto(comment.User) : null)) : [];
 
             const boardResponse = new BoardResponseDto(board, author, commentCount, likeCount, comments);
-            console.log("게시글 상세 조회 성공: ", boardResponse);
             res.status(200).json({
                 message: '게시글 상세 조회 성공',
                 board: boardResponse
             });
+            console.log("게시글 상세 조회 성공: ", boardResponse);
         } catch (error) {
-            console.log("boardId",req.params.boardId);
             console.error("게시글 상세 조회 에러: ", error);
             const statusCode = error.message.includes('찾을 수 없습니다') ? 404 :
                                error.message.includes('권한이 없습니다') ? 403 : 500;
@@ -102,11 +104,14 @@ class BoardController {
             }
 
             const updatedBoard = await boardService.updateBoard(boardId, userId, updateBoardDto);
+            const boardResponse = new BoardResponseDto(updatedBoard, new authorDto(req.user)); // 작성자 정보 포함
 
             res.status(200).json({
                 message: '게시글이 성공적으로 수정되었습니다.',
-                board: new BoardResponseDto(updatedBoard, new authorDto(req.user)) // 수정 후 작성자 정보 포함
+                board: boardResponse 
             });
+
+            console.log("게시글 수정 성공: ", boardResponse);
         } catch (error) {
             console.error("게시글 수정 에러: ", error);
             const statusCode = error.message.includes('찾을 수 없습니다') ? 404 :
@@ -149,10 +154,12 @@ class BoardController {
 
             // CommentResponseDto 적용
             const author = req.user ? new authorDto(req.user) : null; // req.user는 Firebase decoded token
+            const commentResponse = new CommentResponseDto(newComment, author);
             res.status(201).json({
                 message: '댓글이 성공적으로 생성되었습니다.',
-                comment: new CommentResponseDto(newComment, author)
+                comment: commentResponse
             });
+            console.log("댓글 생성 성공: ", commentResponse);
         } catch (error) {
             console.error("댓글 생성 에러: ", error);
             res.status(500).json({
@@ -175,10 +182,12 @@ class BoardController {
 
             // CommentResponseDto 적용
             const author = req.user ? new authorDto(req.user) : null; // req.user는 Firebase decoded token
+            const commentResponse = new CommentResponseDto(updatedComment, author);
             res.status(200).json({
                 message: '댓글이 성공적으로 수정되었습니다.',
-                comment: new CommentResponseDto(updatedComment, author)
+                comment: commentResponse
             });
+            console.log("댓글 수정 성공: ", commentResponse);
         } catch (error) {
             console.error("댓글 수정 에러: ", error);
             const statusCode = error.message.includes('찾을 수 없습니다') ? 404 :
@@ -213,8 +222,8 @@ class BoardController {
             const userId = req.user.uid;
 
             const result = await boardService.toggleLike(boardId, userId);
-
             res.status(200).json(result);
+            console.log("좋아요 상태 변경 성공: ", result);
         } catch (error) {
             console.error("좋아요 토글 에러: ", error);
             res.status(500).json({

@@ -45,6 +45,11 @@ const User = sequelize.define('user', {
     type: DataTypes.STRING(255),
     allowNull: true
   },
+  language: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+    defaultValue: 'ko' // 기본 언어는 한국어
+  },
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,

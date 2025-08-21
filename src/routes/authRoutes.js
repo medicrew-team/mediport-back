@@ -127,6 +127,9 @@ router.post('/logout', verifyToken, authController.logoutUser);
  *                 format: uri
  *                 nullable: true
  *                 example: https://example.com/profile.png
+ *               language:
+ *                 type: string
+ *                 example: ko
  *     responses:
  *       201:
  *         description: 회원가입 성공

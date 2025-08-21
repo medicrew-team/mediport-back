@@ -1,8 +1,8 @@
 const UserService = require("../services/UserService");
 const UpdateProfileDto = require('../dtos/User/updateProfileDto');
 const UserResponseDto = require('../dtos/auth/userResponseDto');
-const authService = require("../services/authService");
-const RegisterUserDto = require('../dtos/User/registerUserDto');
+const MedicationHistoryResponseDto = require('../dtos/User/medicationHistoryResponseDto');
+
 
 
 
@@ -11,10 +11,12 @@ exports.getUserProfile = async (req, res, next) => {
     try {
         const firebaseUid = req.body.uid;
         const user = await UserService.getUserProfile(firebaseUid);
+        const userDto = new UserResponseDto(user);
         res.status(200).json({
             message: '사용자 정보 조회 성공',
-            user: new UserResponseDto(user)
+            user: userDto
         });
+        console.log("사용자 정보 조회 성공: ", userDto);
     } catch (error) {
         console.error("사용자 정보 조회 에러: ", error);
         res.status(500).json({
@@ -22,6 +24,54 @@ exports.getUserProfile = async (req, res, next) => {
         });
     }
 };
+
+
+/**
+ * 사용자의 모든 복약 기록을 조회합니다.
+ */
+exports.getMedicationHistory = async (req, res, next) => {
+    try {
+        const userId = req.body.uid; // Assuming user ID is available from auth middleware
+        const medicationHistory = await UserService.getMedicationHistory(userId);
+
+        const responseData = medicationHistory.map(record => new MedicationHistoryResponseDto(record));
+
+        res.status(200).json({
+            message: '사용자 복약 기록 조회 성공',
+            medicationHistory: responseData
+        });
+        console.log("사용자 복약 기록 조회 성공: ", responseData);
+    } catch (error) {
+        console.error("사용자 복약 기록 조회 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};
+
+/**
+ * 특정 복약 기록의 상세 정보를 조회합니다.
+ */
+exports.getMedicationHistoryDetail = async (req, res, next) => {
+    try {
+        const { historyId } = req.params;
+        const medicationDetail = await UserService.getMedicationHistoryDetail(historyId);
+
+        const responseData = new MedicationHistoryResponseDto(medicationDetail);
+
+        res.status(200).json({
+            message: '복약 기록 상세 조회 성공',
+            medicationDetail: responseData
+        });
+        console.log("복약 기록 상세 조회 성공: ", responseData);
+    } catch (error) {
+        console.error("복약 기록 상세 조회 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};
+
 
 /** 사용자 기저질환 조회 */ 
 exports.getUserDiseases = async (req, res) => {
@@ -32,6 +82,7 @@ exports.getUserDiseases = async (req, res) => {
             message: '사용자 기저질환 조회 성공',
             diseases: diseases
         });
+        console.log("사용자 기저질환 조회 성공: ", diseases);
     } catch (error) {
         console.error("사용자 기저질환 조회 에러: ", error);
         res.status(500).json({
@@ -49,6 +100,7 @@ exports.getUserProhibitMedi = async (req, res) => {
             message: '사용자 기저질환 금기약품 조회 성공',
             prohibit_medi: prohibit_medi
         });
+        console.log("사용자 기저질환 금기약품 조회 성공: ", prohibit_medi);
     }
     catch (error) {
         console.error("사용자 기저질환 금기약품 조회 에러: ", error);
@@ -68,6 +120,7 @@ exports.getProhibitMediDetail = async (req, res) => {
             message: '금기약품 상세정보 조회 성공',
             prohibitDetail: prohibitDetail
         });
+        console.log("금기약품 상세정보 조회 성공: ", prohibitDetail);
     } catch (error) {
         console.error("금기약품 상세정보 조회 에러: ", error);
         res.status(500).json({
@@ -80,16 +133,17 @@ exports.getProhibitMediDetail = async (req, res) => {
 /** 사용자 정보 업데이트 */ 
 exports.updateUserProfile = async (req, res, next) => {
     try {
-        const firebaseUid = req.user.uid;
-        const { phone, disease_ids } = req.body;
-        const updateDto = new UpdateProfileDto( phone, disease_ids);
+        const firebaseUid = req.body.uid;
+        const {phone,nickname,disease_ids,language,img,medi_history} = req.body;
+        const updateDto = new UpdateProfileDto(phone,nickname,disease_ids,language,img,medi_history);
 
         const updatedUser = await UserService.updateUser(firebaseUid, updateDto);
-
+        const userDto = new UserResponseDto(updatedUser);
         res.status(200).json({
             message: '사용자 정보가 성공적으로 업데이트되었습니다.',
-            userProfile: new UserResponseDto(updatedUser)
+            userProfile: userDto
         });
+        console.log("사용자 정보 업데이트 성공: ", userDto);
     } catch (error) {
         console.error("사용자 정보 업데이트 에러: ", error);
         res.status(500).json({
@@ -98,7 +152,7 @@ exports.updateUserProfile = async (req, res, next) => {
     }
 };
 
-// 사용자 탈퇴
+/** 사용자 탈퇴 */ 
 exports.deleteUserProfile = async (req, res, next) => {
     try {
         const firebaseUid = req.user.uid;
