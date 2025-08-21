@@ -55,10 +55,16 @@ exports.parseImage = async( file, target_lang='ko' ) => {
       });
         const { foreign_medicine_names = [] } = data || {};
         const ocrText = foreign_medicine_names.find(s => !!(s && s.trim()))?.trim();
+
+        console.log('3.ocrText:', ocrText);
+        if (!ocrText) {
+          throw new Error ( '의약품명을 추출하지 못했습니다.' );
+        }
         
         if (!ocrText) {
           throw new Error ( '의약품명을 추출하지 못했습니다.' );
         }
+
 
         const [result] = await db.execute(query.parseImage, { ocr: ocrText });
 

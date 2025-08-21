@@ -9,6 +9,7 @@ const userRoutes = require('./routes/UserRoutes');
 const boardRoutes = require('./routes/BoardRoutes'); // 게시판 라우트 추가
 const translateRoutes = require('./routes/translateRoutes');
 const similarRoutes = require('./routes/similarRoutes');
+const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const { swaggerUi, specs } = require('./config/swaggerConfig'); // Swagger 설정 가져오기
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/boards', boardRoutes);
 app.use('/api/translate', translateRoutes);
 app.use('/api/similar', similarRoutes);
+app.use('/api/prescription', prescriptionRoutes);
 
 
 // 기본 라우트 (루트 경로 접근 시)
