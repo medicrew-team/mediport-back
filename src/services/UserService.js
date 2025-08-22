@@ -60,7 +60,7 @@ class UserService {
                     let customName = null;
                 
                     if (h.medi_name) {
-                        const medi = await KrMedi.findOne({ where: { medi_name: h.medi_name } });
+                        const medi = await KrMedi.findOne({ where: { prod_name: h.medi_name } });
                         if (medi) {
                             krMediId = medi.kr_medi_id;
                         } else {
