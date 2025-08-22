@@ -27,13 +27,13 @@ class UserService {
     /** 회원가입 */
     async registerUser(registerDto){
         try{
-                const existingUser = await User.findByPk(registerDto.firebaseUid);
+                const existingUser = await User.findByPk(registerDto.user_id);
     
                 if(existingUser){
                     return { userProfile: existingUser, created: false };
                 }
                 const newUser = await User.create({
-                    user_id: firebaseUid,
+                    user_id: user_id,
                     email: registerDto.email,
                     user_name: registerDto.username,
                     nickname: registerDto.nickname,
@@ -152,9 +152,9 @@ class UserService {
     }
 
     /** 사용자 프로필 조회 */ 
-    async getUserProfile(firebaseUid) {
+    async getUserProfile(user_id) {
             try {
-                const user = await User.findByPk(firebaseUid,{
+                const user = await User.findByPk(user_id,{
                     include: [{
                         model: Disease,
                         as: 'Diseases',
@@ -176,9 +176,9 @@ class UserService {
         }
 
     /** 사용자 정보 업데이트 */
-    async updateUser(firebaseUid, updateDto) {
+    async updateUser(user_id, updateDto) {
         try {
-            const user = await User.findByPk(firebaseUid);
+            const user = await User.findByPk(user_id);
 
             if (!user) {
                 throw new Error('사용자를 찾을 수 없습니다.');
@@ -188,7 +188,7 @@ class UserService {
                 where: { nickname: updateDto.nickname },
                 attributes: ['user_id']
             });
-            if( existingNickname && existingNickname.user_id !== firebaseUid) {
+            if( existingNickname && existingNickname.user_id !== user_id) {
                 throw new Error('이미 사용 중인 닉네임입니다.');
             }
 
@@ -212,23 +212,23 @@ class UserService {
                 }
 
                 await User_Disease.destroy({
-                    where: { user_id: firebaseUid }
+                    where: { user_id: user_id }
                 });
 
                 const userDiseaseData = updateDto.disease_ids.map(disease_id => ({
-                    user_id: firebaseUid,
+                    user_id: user_id,
                     disease_id: disease_id
                 }));
                 await User_Disease.bulkCreate(userDiseaseData);
             } else {
                 // 업데이트하려는 질병 목록이 없는 경우, 기존 관계 모두 삭제
                 await User_Disease.destroy({
-                    where: { user_id: firebaseUid }
+                    where: { user_id: user_id }
                 });
             }
             // 사용자 메디 히스토리 업데이트 (기존 삭제 후 새로 생성)
             await User_Medi_History.destroy({
-                where: { user_id: firebaseUid }
+                where: { user_id: user_id }
             });
             for (const h of updateDto.history) {
                 let krMediId = null;
@@ -243,7 +243,7 @@ class UserService {
                     }
                 }
                 await User_Medi_History.create({
-                    user_id: firebaseUid,
+                    user_id: user_id,
                     kr_medi_id: krMediId,
                     custom_name: customName,
                     start_date: h.start_date,
@@ -257,13 +257,13 @@ class UserService {
                 include: [{
                     model: User_Disease,
                     as: 'User_Diseases',
-                    where: { user_id: firebaseUid },
+                    where: { user_id: user_id },
                     attributes: []
                 }],
                 attributes: ['disease_id', 'disease_name']
             });
             user.User_Medi_History = await User_Medi_History.findAll({
-                where: { user_id: firebaseUid },
+                where: { user_id: user_id },
                 attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
                 include: [{
                     model: Kr_Medi,
@@ -281,9 +281,9 @@ class UserService {
     }
 
     /** 사용자 기저질환 조회 */ 
-    async getUserDiseases(firebaseUid) {
+    async getUserDiseases(user_id) {
         try {
-            const user = await User.findByPk(firebaseUid, {
+            const user = await User.findByPk(user_id, {
                 include: [{
                     model: Disease,
                     as: 'Diseases',
@@ -345,20 +345,20 @@ class UserService {
     };
 
     /** 회원 탈퇴 */
-    async deleteUser(firebaseUid) {
+    async deleteUser(user_id) {
         try {
-            const user = await User.findByPk(firebaseUid);
+            const user = await User.findByPk(user_id);
             if (!user) {
                 throw new Error('사용자를 찾을 수 없습니다.');
             }
             // 기저질환 정보 삭제
             await User_Disease.destroy({
-                where: { user_id: firebaseUid }
+                where: { user_id: user_id }
             });
             // 사용자 정보 삭제
             await user.destroy();
             // Firebase에서 사용자 삭제
-            await admin.auth().deleteUser(firebaseUid);
+            await admin.auth().deleteUser(user_id);
             return { success: true, message: '사용자가 성공적으로 탈퇴되었습니다.' };
         } catch (error) {
             console.error('사용자 탈퇴 에러 : ', error);

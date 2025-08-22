@@ -1,6 +1,6 @@
 class RegisterUserDto {
-    constructor(firebaseUid, email, username, nickname, phone, country, residence, gender, birthday, disease_ids, history, user_img) {
-        this.firebaseUid = firebaseUid;
+    constructor(user_id, email, username, nickname, phone, country, residence, gender, birthday, disease_ids, history, user_img) {
+        this.user_id = user_id;
         this.email = email;
         this.username = username;
         this.nickname = nickname;
