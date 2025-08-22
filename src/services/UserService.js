@@ -93,7 +93,7 @@ class UserService {
                     where: { user_id: newUser.user_id },
                     attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
                     include: [{
-                        model: Kr_Medi,
+                        model: KrMedi,
                         as: 'kr_medi',
                         required: false // kr_medi가 없는 경우도 처리
                     }]
