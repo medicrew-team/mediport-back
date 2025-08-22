@@ -60,7 +60,7 @@ class UserService {
                     let customName = null;
                 
                     if (h.medi_name) {
-                        const medi = await Kr_Medi.findOne({ where: { medi_name: h.medi_name } });
+                        const medi = await KrMedi.findOne({ where: { medi_name: h.medi_name } });
                         if (medi) {
                             krMediId = medi.kr_medi_id;
                         } else {
@@ -234,7 +234,7 @@ class UserService {
                 let krMediId = null;
                 let customName = null;
                 if (h.medi_name) {
-                    const krMedi = await Kr_Medi.findOne({ 
+                    const krMedi = await KrMedi.findOne({ 
                     where: { medi_name: h.medi_name } });
                     if (krMedi) {
                         krMediId = krMedi.kr_medi_id;
@@ -266,7 +266,7 @@ class UserService {
                 where: { user_id: user_id },
                 attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
                 include: [{
-                    model: Kr_Medi,
+                    model: KrMedi,
                     as: 'kr_medi',
                     required: false // kr_medi가 없는 경우도 처리
                 }]
