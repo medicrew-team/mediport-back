@@ -49,7 +49,7 @@ const upload = multer({
  * /similar/foreign-medicine/image:
  *   post:
  *     summary: 이미지 업로드 후 OCR 결과 반환
- *     tags: [OCR]
+ *     tags: [similar]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -76,7 +76,7 @@ const upload = multer({
  *                 text:
  *                   type: string
  *                   description: 추출된 텍스트
- *                   example: "{ "foreign_medicine_names": [ "开瑞坦" ] }"
+ *                   example: '{ "foreign_medicine_names": ["开瑞坦"] }'
  *                 provider:
  *                   type: string
  *                   example: google_vision
@@ -110,7 +110,7 @@ router.post('/foreign-medicine/image', upload.single('file'), similarController.
  * /similar/foreign-medicine/text:
  *   post:
  *     summary: 텍스트 입력 후 처리 결과 반환
- *     tags: [Similar]
+ *     tags: [similar]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
