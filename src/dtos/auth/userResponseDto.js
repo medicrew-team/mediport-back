@@ -1,6 +1,6 @@
 class UserResponseDto {
     constructor(user) {
-        this.uid = user.user_id; 
+        this.user_id = user.user_id; 
         this.email = user.email;
         this.username = user.user_name;
         this.nickname = user.nickname;
@@ -10,7 +10,7 @@ class UserResponseDto {
         this.country = user.country;
         this.residence = user.region;
         this.createdAt = user.created_at;
-        this.diseases = user.Diseases ? user.Diseases.map(d => ({
+        this.diseases = user.Disease ? user.Disease.map(d => ({
             id: d.disease_id
         })) : []
         this.history = user.User_Medi_History ? user.User_Medi_History.map(m => ({

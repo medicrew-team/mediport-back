@@ -80,25 +80,18 @@ class UserService {
                 }
                 
                 // 사용자 프로필 반환
-                newUser.Diseases = await Disease.findAll({
-                    include: [{
-                        model: User_Disease,
-                        as: 'User_Diseases',
-                        where: { user_id: newUser.user_id },
-                        attributes: []
-                    }],
-                    attributes: ['disease_id', 'disease_name']
-                });
+                newUser.Diseases = await User.findByPk(newUser.user_id, {
+                    include: [{ model: Disease, as: 'Disease' }]
+                  });
                 newUser.User_Medi_History = await User_Medi_History.findAll({
                     where: { user_id: newUser.user_id },
                     attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
                     include: [{
                         model: KrMedi,
-                        as: 'kr_medi',
                         required: false // kr_medi가 없는 경우도 처리
                     }]
                 });
-                return {User : newUser , created: true};
+                return { userProfile : newUser , created: true};
             }
             catch(error){
                 console.error('회원가입 에러 : ',error)
@@ -157,7 +150,7 @@ class UserService {
                 const user = await User.findByPk(user_id,{
                     include: [{
                         model: Disease,
-                        as: 'Diseases',
+                        as: 'Disease',
                         attributes: ['disease_id', 'disease_name'],
                         through: { attributes: [] } // 연결 테이블의 속성은 필요 없으므로 비워둠
                     }, {
@@ -168,7 +161,7 @@ class UserService {
                 if (!user) {
                     throw new Error('사용자를 찾을 수 없습니다.');
                 }
-                return user;
+                return { User: newUser, created: true };
             } catch (error) {
                 console.error('사용자 프로필 조회 에러 : ', error);
                 throw new Error(`사용자 프로필 조회 실패: ${error.message}`);
@@ -253,21 +246,14 @@ class UserService {
                 });
             }
             // 사용자 프로필 반환
-            user.Diseases = await Disease.findAll({
-                include: [{
-                    model: User_Disease,
-                    as: 'User_Diseases',
-                    where: { user_id: user_id },
-                    attributes: []
-                }],
-                attributes: ['disease_id', 'disease_name']
-            });
+            user.Diseases = await User.findByPk(user_id, {
+                include: [{ model: Disease, as: 'Disease' }]
+              })
             user.User_Medi_History = await User_Medi_History.findAll({
                 where: { user_id: user_id },
                 attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
                 include: [{
                     model: KrMedi,
-                    as: 'kr_medi',
                     required: false // kr_medi가 없는 경우도 처리
                 }]
             });

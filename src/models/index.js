@@ -46,7 +46,7 @@ function setupAssociations() {
     user_medi_history.belongsTo(kr_medi, { foreignKey: 'kr_medi_id' });
 
     // user와 disease의 다대다 관계 설정
-    user.belongsToMany(disease, { through: user_disease, foreignKey: 'user_id', as: 'Diseases' });
+    user.belongsToMany(disease, { through: user_disease, foreignKey: 'user_id', as: 'Disease' });
     disease.belongsToMany(user, { through: user_disease, foreignKey: 'disease_id' });
 
     
