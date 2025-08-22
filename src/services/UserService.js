@@ -33,7 +33,7 @@ class UserService {
                     return { userProfile: existingUser, created: false };
                 }
                 const newUser = await User.create({
-                    user_id: user_id,
+                    user_id: registerDto.user_id,
                     email: registerDto.email,
                     user_name: registerDto.username,
                     nickname: registerDto.nickname,
