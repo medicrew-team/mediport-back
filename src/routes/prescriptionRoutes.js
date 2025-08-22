@@ -49,7 +49,7 @@ const upload = multer({
  * /korean-medicine/image:
  *   post:
  *     summary: 이미지 업로드 후 OCR 결과 반환
- *     tags: [OCR]
+ *     tags: [prescription]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -76,10 +76,8 @@ const upload = multer({
  *                 text:
  *                   type: string
  *                   description: 추출된 텍스트
- *                   example: "{ "medicine_names": [ "엔클로페낙정" ] }"
- *                 provider:
- *                   type: string
- *                   example: google_vision
+ *                   example: '{ "medicine_names": ["엔클로페낙정"] }'
+ *                
  *       400:
  *         description: 잘못된 요청 (파일 누락, 잘못된 형식)
  *         content:
