@@ -134,8 +134,8 @@ exports.getProhibitMediDetail = async (req, res) => {
 exports.updateUserProfile = async (req, res, next) => {
     try {
         const firebaseUid = req.user.uid;
-        const {phone,nickname,disease_ids,language,img,medi_history} = req.body;
-        const updateDto = new UpdateProfileDto(phone,nickname,disease_ids,language,img,medi_history);
+        const {phone,nickname,disease_ids,language,history,user_img} = req.body;
+        const updateDto = new UpdateProfileDto(phone,nickname,disease_ids,language,history,user_img);
 
         const updatedUser = await UserService.updateUser(firebaseUid, updateDto);
         const userDto = new UserResponseDto(updatedUser);
