@@ -190,9 +190,10 @@ class UserService {
             }
 
             // 사용자 기본 정보 업데이트
+            user.nickname = updateDto.nickname || user.nickname;
             user.phone = updateDto.phone || user.phone;
             user.language = updateDto.language || user.language; // 언어 정보 업데이트
-            user.img = updateDto.img || user.user_img; // 프로필 이미지 업데이트
+            user.user_img = updateDto.user_img || user.user_img; // 프로필 이미지 업데이트
             await user.save();
 
             // 기저질환 정보 업데이트 (기존 삭제 후 새로 생성)
