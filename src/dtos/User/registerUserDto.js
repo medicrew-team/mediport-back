@@ -7,7 +7,7 @@ class RegisterUserDto {
         this.phone = phone;
         this.gender = gender;
         this.country = country;
-        this.region = residence;
+        this.residence = residence;
         this.birthday = birthday;
         this.disease_ids = Array.isArray(disease_ids) ? disease_ids : [];
         this.history = Array.isArray(history) ? history : []; 
