@@ -13,8 +13,8 @@ class UserResponseDto {
         this.diseases = user.Disease ? user.Disease.map(d => ({
             id: d.disease_id
         })) : []
-        this.history = user.User_Medi_History ? user.User_Medi_History.map(m => ({
-            name: m.medi_name,
+        this.history = user.UserMediHistories ? user.UserMediHistories.map(m => ({
+            name: m.KrMedi ? m.KrMedi.prod_name : m.custom_name,
             start_date: m.start_date,
             end_date: m.end_date,
             status: m.status,

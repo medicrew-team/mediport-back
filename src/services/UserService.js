@@ -155,13 +155,17 @@ class UserService {
                         through: { attributes: [] } // 연결 테이블의 속성은 필요 없으므로 비워둠
                     }, {
                         model : User_Medi_History,
-                        as: 'User_Medi_History'
+                        as: 'UserMediHistories',
+                        include: [{
+                            model: KrMedi,
+                            required: false // kr_medi가 없는 경우도 처리
+                        }]
                     }]
                 });
                 if (!user) {
                     throw new Error('사용자를 찾을 수 없습니다.');
                 }
-                return { User: newUser, created: true };
+                return user.get({ plain: true });
             } catch (error) {
                 console.error('사용자 프로필 조회 에러 : ', error);
                 throw new Error(`사용자 프로필 조회 실패: ${error.message}`);
