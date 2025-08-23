@@ -2,6 +2,7 @@ const UserService = require("../services/UserService");
 const UpdateProfileDto = require('../dtos/User/updateProfileDto');
 const UserResponseDto = require('../dtos/auth/userResponseDto');
 const MedicationHistoryResponseDto = require('../dtos/User/medicationHistoryResponseDto');
+const updateMedicationHistoryDto = require('../dtos/User/updateMedicationHistoryDto');
 
 
 
@@ -48,6 +49,28 @@ exports.getMedicationHistory = async (req, res, next) => {
         });
     }
 };
+/**
+ * 사용자의 복약 기록을 업데이트합니다.
+ */
+exports.updateMedicationHistory = async (req, res, next) => {
+    try {
+        const userId = req.user.uid; 
+        const { medi_name,start_name,end_name,status,dosage } = req.body;
+        const medications = new updateMedicationHistoryDto(medi_name,start_name,end_name,status,dosage); 
+        const updatedHistory = await UserService.updateMedicationHistory(userId, medications);
+        const responseData = new MedicationHistoryResponseDto(updatedHistory);
+        res.status(200).json({
+            message: '복약 기록이 성공적으로 업데이트되었습니다.',
+            updatedHistory: responseData
+        });
+        console.log("복약 기록 업데이트 성공: ", responseData);
+    } catch (error) {
+        console.error("복약 기록 업데이트 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};
 
 /**
  * 특정 복약 기록의 상세 정보를 조회합니다.
@@ -85,6 +108,24 @@ exports.getUserDiseases = async (req, res) => {
         console.log("사용자 기저질환 조회 성공: ", diseases);
     } catch (error) {
         console.error("사용자 기저질환 조회 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};
+/** 사용자 기저질환 업데이트 */
+exports.updateUserDiseases = async (req, res) => {
+    try {
+        const firebaseUid = req.user.uid;
+        const { disease_ids } = req.body; // Expecting an array of disease IDs
+        const updatedDiseases = await UserService.updateUserDiseases(firebaseUid, disease_ids);
+        res.status(200).json({
+            message: '사용자 기저질환이 성공적으로 업데이트되었습니다.',
+            updatedDiseases: updatedDiseases
+        });
+        console.log("사용자 기저질환 업데이트 성공: ", updatedDiseases);
+    } catch (error) {
+        console.error("사용자 기저질환 업데이트 에러: ", error);
         res.status(500).json({
             message: error.message || '서버 에러'
         });
@@ -134,8 +175,8 @@ exports.getProhibitMediDetail = async (req, res) => {
 exports.updateUserProfile = async (req, res, next) => {
     try {
         const firebaseUid = req.user.uid;
-        const {phone,nickname,disease_ids,language,history,user_img} = req.body;
-        const updateDto = new UpdateProfileDto(phone,nickname,disease_ids,language,history,user_img);
+        const {phone,nickname,language,user_img} = req.body;
+        const updateDto = new UpdateProfileDto(phone,nickname,language,user_img);
 
         const updatedUser = await UserService.updateUser(firebaseUid, updateDto);
         const userDto = new UserResponseDto(updatedUser);

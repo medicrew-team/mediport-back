@@ -100,7 +100,7 @@ class UserService {
         };
 
    
-        /**
+    /**
      * 사용자의 모든 복약 기록을 조회합니다.
      * kr_medi_id가 없는 경우 custom_name을 사용하고, kr_medi 정보는 null로 처리합니다.
      */
@@ -120,7 +120,49 @@ class UserService {
             throw new Error(`사용자 복약 기록 조회 실패: ${error.message}`);
         }
     }
+    /**
+     * 복약 기록을 업데이트합니다.
+     * kr_medi_id가 없는 경우 custom_name을 사용하고, kr_medi 정보는 null로 처리합니다.
+     */
+    async updateMedicationHistory(userId, updateData) {
+        try {
+            const history = await User_Medi_History.findAll({where: { user_id: userId }});
 
+            if (!history) {
+                throw new Error('복약 기록을 찾을 수 없습니다.');
+            }
+
+            if (history.user_id !== userId) {
+                throw new Error('권한이 없습니다.');
+            }
+
+            let krMediId = null;
+            let customName = null;
+
+            if (updateData.medi_name) {
+                const medi = await KrMedi.findOne({ where: { prod_name: updateData.medi_name } });
+                if (medi) {
+                    krMediId = medi.kr_medi_id;
+                } else {
+                    customName = updateData.medi_name; // DB에 없는 약은 custom_name에 저장
+                }
+            }
+
+            history.kr_medi_id = krMediId;
+            history.custom_name = customName;
+            history.start_date = updateData.start_date || history.start_date;
+            history.end_date = updateData.end_date || history.end_date;
+            history.status = updateData.status || history.status;
+            history.dosage = updateData.dosage || history.dosage;
+
+            await history.save();
+
+            return history;
+        } catch (error) {
+            console.error('복약 기록 업데이트 에러:', error);
+            throw new Error(`복약 기록 업데이트 실패: ${error.message}`);
+        }
+    }
     /**
      * 특정 복약 기록의 상세 정보를 조회합니다.
      * kr_medi_id가 없는 경우 custom_name을 사용하고, kr_medi 정보는 null로 처리합니다.
@@ -195,73 +237,7 @@ class UserService {
             user.language = updateDto.language || user.language; // 언어 정보 업데이트
             user.user_img = updateDto.user_img || user.user_img; // 프로필 이미지 업데이트
             await user.save();
-
-            // 기저질환 정보 업데이트 (기존 삭제 후 새로 생성)
-            if (updateDto.disease_ids && updateDto.disease_ids.length > 0) {
-                // disease_ids 유효성 검사
-                const foundDiseases = await Disease.findAll({
-                    where: {
-                        disease_id: updateDto.disease_ids
-                    }
-                });
-
-                if (foundDiseases.length !== updateDto.disease_ids.length) {
-                    throw new Error('존재하지 않는 질병 ID가 포함되어 있습니다.');
-                }
-
-                await User_Disease.destroy({
-                    where: { user_id: user_id }
-                });
-
-                const userDiseaseData = updateDto.disease_ids.map(disease_id => ({
-                    user_id: user_id,
-                    disease_id: disease_id
-                }));
-                await User_Disease.bulkCreate(userDiseaseData);
-            } else {
-                // 업데이트하려는 질병 목록이 없는 경우, 기존 관계 모두 삭제
-                await User_Disease.destroy({
-                    where: { user_id: user_id }
-                });
-            }
-            // 사용자 메디 히스토리 업데이트 (기존 삭제 후 새로 생성)
-            await User_Medi_History.destroy({
-                where: { user_id: user_id }
-            });
-            for (const h of updateDto.history) {
-                let krMediId = null;
-                let customName = null;
-                if (h.medi_name) {
-                    const krMedi = await KrMedi.findOne({ 
-                    where: { medi_name: h.medi_name } });
-                    if (krMedi) {
-                        krMediId = krMedi.kr_medi_id;
-                    } else {
-                        customName = h.medi_name; // DB에 없는 약은 custom_name에 저장
-                    }
-                }
-                await User_Medi_History.create({
-                    user_id: user_id,
-                    kr_medi_id: krMediId,
-                    custom_name: customName,
-                    start_date: h.start_date,
-                    end_date: h.end_date || null,
-                    status: h.status || '복용 중',
-                    dosage: h.dosage || null
-                });
-            }
-            // 사용자 프로필 반환
-            user.Diseases = await User.findByPk(user_id, {
-                include: [{ model: Disease, as: 'Disease' }]
-              })
-            user.User_Medi_History = await User_Medi_History.findAll({
-                where: { user_id: user_id },
-                attributes: ['history_id', 'kr_medi_id', 'custom_name', 'start_date', 'end_date', 'status', 'dosage'],
-                include: [{
-                    model: KrMedi,
-                    required: false // kr_medi가 없는 경우도 처리
-                }]
-            });
+     
             // 사용자 프로필 반환
             return user;
 
@@ -291,6 +267,34 @@ class UserService {
             throw new Error(`사용자 기저질환 조회 실패: ${error.message}`);
         }
     }
+    /** 사용자 기저질환 업데이트 */
+    async updateUserDiseases(user_id, disease_ids) {
+        try {
+            const user = await User.findByPk(user_id);
+            if (!user) {
+                throw new Error('사용자를 찾을 수 없습니다.');
+            }
+            // 기존 기저질환 삭제
+            await User_Disease.destroy({
+                where: { user_id: user_id }
+            });
+            // 새로운 기저질환 추가
+            if (disease_ids && disease_ids.length > 0) {
+                const userDiseaseData = disease_ids.map(disease_id => ({
+                    user_id: user_id,
+                    disease_id: disease_id
+                }));
+                await User_Disease.bulkCreate(userDiseaseData);
+            }
+            // 업데이트된 기저질환 반환
+            const updatedDiseases = await this.getUserDiseases(user_id);
+            return updatedDiseases;
+        }
+        catch (error) {
+            console.error('사용자 기저질환 업데이트 에러 : ', error);
+            throw new Error(`사용자 기저질환 업데이트 실패: ${error.message}`);
+        }    
+    }  
     /** 기저질환 금기약품 조회 */
     async getUserDiseasesProhibit(disease_id,target_lang= 'ko') {
         try {

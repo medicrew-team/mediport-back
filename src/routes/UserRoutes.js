@@ -3,6 +3,7 @@ const router= express.Router();
 const UserController  = require('../controllers/UserController')
 const { verifyToken, validate, registerValidationRules, updateProfileValidationRules } = require('../middleware/authMiddleware');
 const { route } = require('./authRoutes');
+const User = require('../models/user');
 
 /**
  * @swagger
@@ -42,7 +43,8 @@ const { route } = require('./authRoutes');
  *       500:
  *         description: 서버 에러
  *   put:
- *     summary: 사용자 프로필 업데이트
+ *     summary: 사용자 프로필 업데이트 (기본 정보)
+ *     description: 사용자의 기본 정보(전화번호, 언어, 프로필 이미지 등)를 업데이트합니다.
  *     tags: [user]
  *     security:
  *       - bearerAuth: []
@@ -56,11 +58,6 @@ const { route } = require('./authRoutes');
  *               phone:
  *                 type: string
  *                 description: 업데이트할 사용자 전화번호
- *               disease_ids:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 description: 업데이트할 기저질환 ID 목록
  *               language:
  *                 type: string
  *                 description: "사용자의 선호 언어 코드 (예: 'ko', 'en')"
@@ -68,35 +65,10 @@ const { route } = require('./authRoutes');
  *                 type: string
  *                 format: uri
  *                 description: 사용자의 프로필 이미지 URL
- *               history:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     medi_name:
- *                       type: string
- *                     start_date:
- *                       type: string
- *                       format: date
- *                     end_date:
- *                       type: string
- *                       format: date
- *                     status:
- *                       type: string
- *                     dosage:
- *                       type: string
- *                 description: 사용자가 복용 중인 약물 이력
  *             example:
  *               phone: "010-1111-2222"
- *               disease_ids: [2, 4]
- *               language: "ko"
+ *               language: "en"
  *               user_img: https://example.com/profile.png
- *               history:
- *                 - medi_name: "약 이름"
- *                   start_date: "2023-01-01"
- *                   end_date: "2023-12-31"
- *                   status: "복용 중"
- *                   dosage: "1일 1회"
  *     responses:
  *       200:
  *         description: 사용자 정보 업데이트 성공
@@ -159,6 +131,57 @@ router.put(
  *         description: 인증 실패 (유효하지 않은 토큰)
  *       500:
  *         description: 서버 에러
+ *   put:
+ *     summary: 사용자 복약 기록 업데이트
+ *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               history:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     medi_name:
+ *                       type: string
+ *                     start_date:
+ *                       type: string
+ *                       format: date
+ *                     end_date:
+ *                       type: string
+ *                       format: date
+ *                     status:
+ *                       type: string
+ *                     dosage:
+ *                       type: string
+ *                 description: 사용자가 복용 중인 약물 이력
+ *             example:
+ *               history:
+ *                 - medi_name: "타이레놀"
+ *                   start_date: "2023-01-01"
+ *                   end_date: "2023-12-31"
+ *                   status: "복용 완료"
+ *                   dosage: "1일 1회"
+ *                 - medi_name: "아스피린"
+ *                   start_date: "2024-01-01"
+ *                   status: "복용 중"
+ *                   dosage: "1일 2회"
+ *     responses:
+ *       200:
+ *         description: 복약 기록 업데이트 성공
+ *       400:
+ *         description: 잘못된 요청
+ *       401:
+ *         description: 인증 실패
+ *       500:
+ *         description: 서버 에러
+ *
  * /api/users/medications/{historyId}:
  *   get:
  *     summary: 특정 복약 기록 상세 조회
@@ -197,7 +220,9 @@ router.get(
     verifyToken,
     UserController.getMedicationHistory
 );
-
+router.put(
+    '/medications',
+    verifyToken,UserController.updateMedicationHistory)
 router.get(
     '/medications/:historyId',
     verifyToken,
@@ -239,9 +264,37 @@ router.get(
  *         description: 사용자를 찾을 수 없음
  *       500:
  *         description: 서버 에러
+ *   put:
+ *     summary: 사용자 기저질환 업데이트
+ *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               disease_ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: 업데이트할 기저질환 ID 목록
+ *             example:
+ *               disease_ids: [1, 5, 12]
+ *     responses:
+ *       200:
+ *         description: 기저질환 정보 업데이트 성공
+ *       400:
+ *         description: 잘못된 요청
+ *       401:
+ *         description: 인증 실패
+ *       500:
+ *         description: 서버 에러
  */
 router.get('/profile/diseases',verifyToken,UserController.getUserDiseases);
-
+router.put('/profile/diseases',verifyToken,UserController.updateUserDiseases);
 /**
  * @swagger
  * /api/users/profile/diseases/{disease_id}:
