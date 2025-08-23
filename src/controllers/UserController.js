@@ -9,7 +9,7 @@ const MedicationHistoryResponseDto = require('../dtos/User/medicationHistoryResp
 /** 사용자 프로필 조회 */ 
 exports.getUserProfile = async (req, res, next) => {
     try {
-        const firebaseUid = req.body.uid;
+        const firebaseUid = req.user.uid;
         const user = await UserService.getUserProfile(firebaseUid);
         const userDto = new UserResponseDto(user);
         res.status(200).json({
@@ -31,7 +31,7 @@ exports.getUserProfile = async (req, res, next) => {
  */
 exports.getMedicationHistory = async (req, res, next) => {
     try {
-        const userId = req.body.uid; // Assuming user ID is available from auth middleware
+        const userId = req.user.uid; // Assuming user ID is available from auth middleware
         const medicationHistory = await UserService.getMedicationHistory(userId);
 
         const responseData = medicationHistory.map(record => new MedicationHistoryResponseDto(record));
@@ -76,7 +76,7 @@ exports.getMedicationHistoryDetail = async (req, res, next) => {
 /** 사용자 기저질환 조회 */ 
 exports.getUserDiseases = async (req, res) => {
     try {
-        const firebaseUid = req.body.uid;
+        const firebaseUid = req.user.uid;
         const diseases = await UserService.getUserDiseases(firebaseUid);
         res.status(200).json({
             message: '사용자 기저질환 조회 성공',
@@ -133,7 +133,7 @@ exports.getProhibitMediDetail = async (req, res) => {
 /** 사용자 정보 업데이트 */ 
 exports.updateUserProfile = async (req, res, next) => {
     try {
-        const firebaseUid = req.body.uid;
+        const firebaseUid = req.user.uid;
         const {phone,nickname,disease_ids,language,img,medi_history} = req.body;
         const updateDto = new UpdateProfileDto(phone,nickname,disease_ids,language,img,medi_history);
 
