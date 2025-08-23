@@ -8,7 +8,7 @@ class UserResponseDto {
         this.birthday = user.birthday;
         this.phone = user.phone;
         this.country = user.country;
-        this.residence = user.residence;
+        this.residence = user.region;
         this.createdAt = user.created_at;
         this.diseases = user.Disease ? user.Disease.map(d => ({
             id: d.disease_id
