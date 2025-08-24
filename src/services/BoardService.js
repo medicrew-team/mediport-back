@@ -14,7 +14,17 @@ class BoardService {
                 user_id: userId,
                 category_id: boardDto.categoryId   // category_id 저장
             });
-            return newBoard;
+            const boardWithCategory = await Board.findByPk(newBoard.board_id, 
+            {
+                include: [
+                    { model: User, attributes: ['user_id', 'nickname', 'country', 'user_img', 'region'] },
+                    {
+                        model: Category,
+                        attributes: ['category_id', 'category_name']
+                    }
+                ]
+            });
+            return boardWithCategory;
         } catch (error) {
             console.error('게시글 생성 에러 : ', error);
             throw new Error(`게시글 생성 실패: ${error.message}`);
@@ -41,8 +51,8 @@ class BoardService {
                 where: whereClause,
                 attributes: {
                     include: [
-                        [sequelize.fn("COUNT", sequelize.col("comments.comment_id")), "commentCount"],
-                        [sequelize.fn("COUNT", sequelize.col("likes.like_id")), "likeCount"]
+                        [sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("comments.comment_id"))), "commentCount"],
+                        [sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("likes.like_id"))), "likeCount"]
                     ]
                 },
                 include: [
@@ -68,25 +78,28 @@ class BoardService {
         }
     }
 
-    async getBoardById(boardId,category) {
+    async getBoardById(boardId) {
         try {
             const board = await Board.findOne({
                 where: { board_id: boardId },
                 include: [
                     {
                         model: User,
-                        attributes: ['user_id', 'nickname','email', 'phone', 'country']
+                        attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ]
                     },
                     {
                         model: Comment,
                         include: {
                             model: User,
-                            attributes: ['user_id', 'user_name', 'country'] 
+                            attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] 
                         }
                     },
                     {
                         model: Like,
-                        attributes: ['user_id']
+                        include: {
+                            model: User,
+                            attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] 
+                        }
                     },
                     {
                         model: Category,
@@ -121,8 +134,36 @@ class BoardService {
             board.content = updateData.content || board.content;
             board.category_id = updateData.categoryId || board.category_id;  // FK 수정
             await board.save();
-    
-            return board;
+
+            const updateBoard = await Board.findOne({
+                where: { board_id: boardId },
+                include: [
+                    {
+                        model: User,
+                        attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ]
+                    },
+                    {
+                        model: Comment,
+                        include: {
+                            model: User,
+                            attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] 
+                        }
+                    },
+                    {
+                        model: Like,
+                        include: {
+                            model: User,
+                            attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] 
+                        }
+                    },
+                    {
+                        model: Category,
+                        attributes: ['category_id', 'category_name']
+                    }
+                ],
+                order: [[Comment, 'created_at', 'ASC']]
+            });
+            return updateBoard;
         } catch (error) {
             console.error('게시글 수정 에러 : ', error);
             throw new Error(`게시글 수정 실패: ${error.message}`);
@@ -157,7 +198,14 @@ class BoardService {
                 user_id: userId,
                 content: content
             });
-            return newComment;
+
+            const commentWithUser = await Comment.findByPk(newComment.comment_id, {
+                include: [
+                    { model: User, attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] }
+                ]
+            });
+    
+            return commentWithUser;
         } catch (error) {
             console.error('댓글 생성 에러 : ', error);
             throw new Error(`댓글 생성 실패: ${error.message}`);
@@ -184,7 +232,12 @@ class BoardService {
             comment.content = content;
             await comment.save();
 
-            return comment;
+            const commentWithUser = await Comment.findByPk(newComment.comment_id, {
+                include: [
+                    { model: User, attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] }
+                ]
+            });
+            return commentWithUser;
         } catch (error) {
             console.error('댓글 수정 에러 : ', error);
             throw new Error(`댓글 수정 실패: ${error.message}`);
