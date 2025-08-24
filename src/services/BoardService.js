@@ -40,8 +40,8 @@ class BoardService {
                 where: whereClause,
                 attributes: {
                     include: [
-                        [sequelize.fn("COUNT", sequelize.col("Comments.comment_id")), "commentCount"],
-                        [sequelize.fn("COUNT", sequelize.col("Likes.like_id")), "likeCount"]
+                        [sequelize.fn("COUNT", sequelize.col("comment.comment_id")), "commentCount"],
+                        [sequelize.fn("COUNT", sequelize.col("like.like_id")), "likeCount"]
                     ]
                 },
                 include: [
