@@ -16,17 +16,6 @@ const category = sequelize.define('category', {
         allowNull: false,
         unique: true
     },
-    // 부모 카테고리 ID (자기 참조 외래키)
-    parent_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-            model: 'category',
-            key: 'category_id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL' // 부모 카테고리가 삭제되면 이 카테고리는 NULL로 설정
-    },
     
 },{
     tableName: 'category',
