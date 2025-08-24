@@ -131,8 +131,8 @@ router.put(
  *         description: 인증 실패 (유효하지 않은 토큰)
  *       500:
  *         description: 서버 에러
- *   put:
- *     summary: 사용자 복약 기록 업데이트
+ *   post:
+ *     summary: 사용자 복약 기록 추가
  *     tags: [user]
  *     security:
  *       - bearerAuth: []
@@ -141,40 +141,20 @@ router.put(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               history:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     medi_name:
- *                       type: string
- *                     start_date:
- *                       type: string
- *                       format: date
- *                     end_date:
- *                       type: string
- *                       format: date
- *                     status:
- *                       type: string
- *                     dosage:
- *                       type: string
- *                 description: 사용자가 복용 중인 약물 이력
- *             example:
- *               history:
- *                 - medi_name: "타이레놀"
- *                   start_date: "2023-01-01"
- *                   end_date: "2023-12-31"
- *                   status: "복용 완료"
- *                   dosage: "1일 1회"
- *                 - medi_name: "아스피린"
- *                   start_date: "2024-01-01"
- *                   status: "복용 중"
- *                   dosage: "1일 2회"
+ *             $ref: '#/components/schemas/UpdateMedicationHistoryDto'
  *     responses:
- *       200:
- *         description: 복약 기록 업데이트 성공
+ *       201:
+ *         description: 복약 기록 추가 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 복약 기록이 성공적으로 추가되었습니다.
+ *                 newHistory:
+ *                   $ref: '#/components/schemas/MedicationHistoryResponseDto'
  *       400:
  *         description: 잘못된 요청
  *       401:
@@ -214,15 +194,93 @@ router.put(
  *         description: 복약 기록을 찾을 수 없음
  *       500:
  *         description: 서버 에러
+ *   put:
+ *     summary: 특정 복약 기록 업데이트
+ *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: historyId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: 수정할 복약 기록의 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateMedicationHistoryDto'
+ *     responses:
+ *       200:
+ *         description: 복약 기록 업데이트 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 복약 기록이 성공적으로 업데이트되었습니다.
+ *                 updatedHistory:
+ *                   $ref: '#/components/schemas/MedicationHistoryResponseDto'
+ *       400:
+ *         description: 잘못된 요청
+ *       401:
+ *         description: 인증 실패
+ *       404:
+ *         description: 복약 기록을 찾을 수 없음
+ *       500:
+ *         description: 서버 에러
+ *   delete:
+ *     summary: 특정 복약 기록 삭제
+ *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: historyId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: 삭제할 복약 기록의 ID
+ *     responses:
+ *       200:
+ *         description: 복약 기록 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 복약 기록이 성공적으로 삭제되었습니다.
+ *       401:
+ *         description: 인증 실패
+ *       404:
+ *         description: 복약 기록을 찾을 수 없음
+ *       500:
+ *         description: 서버 에러
  */
 router.get(
     '/medications',
     verifyToken,
     UserController.getMedicationHistory
 );
-router.put(
+router.post(
     '/medications',
+    verifyToken,
+    UserController.addMedicationHistory
+);
+router.put(
+    '/medications/:historyId',
     verifyToken,UserController.updateMedicationHistory)
+router.delete(
+    '/medications/:historyId',
+    verifyToken,
+    UserController.deleteMedicationHistory
+);
 router.get(
     '/medications/:historyId',
     verifyToken,

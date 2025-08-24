@@ -112,6 +112,35 @@ const options = {
             country: { type: 'string' },
             region: { type: 'string' }
           }
+        },
+        MedicationHistoryResponseDto: {
+          type: 'object',
+          properties: {
+            history_id: { type: 'integer' },
+            medi_name: { type: 'string' },
+            custom_name: { type: 'string' },
+            start_date: { type: 'string', format: 'date' },
+            end_date: { type: 'string', format: 'date' },
+            status: { type: 'string' },
+            dosage: { type: 'string' }
+          }
+        },
+        UpdateMedicationHistoryDto: {
+          type: 'object',
+          properties: {
+            medi_name: { type: 'string' },
+            start_date: { type: 'string', format: 'date' },
+            end_date: { type: 'string', format: 'date' },
+            status: { type: 'string' },
+            dosage: { type: 'string' }
+          },
+          example: {
+            medi_name: "아스피린",
+            start_date: "2024-01-01",
+            end_date: "2024-12-31",
+            status: "복용 중",
+            dosage: "1일 1회"
+          }
         }
       },
     },
