@@ -3,6 +3,7 @@ const Board = require('../models/board');
 const User = require('../models/user');
 const Comment = require('../models/comment');
 const Like = require('../models/like');
+const Category = require('../models/category');
 
 class BoardService {
     async createBoard(userId, boardDto) {
@@ -11,7 +12,7 @@ class BoardService {
                 title: boardDto.title,
                 content: boardDto.content,
                 user_id: userId,
-                category: boardDto.category // category 필드 추가
+                category_id: boardDto.categoryId   // category_id 저장
             });
             return newBoard;
         } catch (error) {
@@ -20,22 +21,22 @@ class BoardService {
         }
     }
 
-    async getBoards(page, limit, search, category) {
+    async getBoards(page, limit, search, categoryId) {
         try {
             const offset = (page - 1) * limit;
             const whereClause = {};
-
+    
             if (search) {
                 whereClause[Op.or] = [
                     { title: { [Op.like]: `%${search}%` } },
                     { content: { [Op.like]: `%${search}%` } }
                 ];
             }
-
-            if (category) {
-                whereClause.category = category;
+    
+            if (categoryId) {
+                whereClause.category_id = categoryId;  // FK 기준으로 검색
             }
-
+    
             const boards = await Board.findAndCountAll({
                 where: whereClause,
                 attributes: {
@@ -47,23 +48,19 @@ class BoardService {
                 include: [
                     {
                         model: User,
-                        attributes: ['user_id', 'user_name']
+                        attributes: ['user_id', 'nickname', 'country', 'user_img', 'region']
                     },
-                    {
-                        model: Comment,
-                        attributes: []
-                    },
-                    {
-                        model: Like,
-                        attributes: []
-                    }
+                    { model: Comment, attributes: [] },
+                    { model: Like, attributes: [] },
+                    { model: Category, attributes: ['category_id', 'category_name'] }
                 ],
                 group: ['board.board_id'],
                 order: [['created_at', 'DESC']],
-                offset: offset,
-                limit: limit,
+                offset,
+                limit,
                 subQuery: false
             });
+    
             return boards;
         } catch (error) {
             console.error('게시글 목록 조회 에러 : ', error);
@@ -73,27 +70,30 @@ class BoardService {
 
     async getBoardById(boardId,category) {
         try {
-            const board = await Board.findByPk(boardId, {
+            const board = await Board.findOne({
+                where: { board_id: boardId },
                 include: [
                     {
-                        model: User, // 게시글 작성자
-                        attributes: ['user_id', 'user_name','email', 'phone', 'country']
+                        model: User,
+                        attributes: ['user_id', 'nickname','email', 'phone', 'country']
                     },
                     {
-                        model: Comment, // 댓글 목록
+                        model: Comment,
                         include: {
-                            model: User, // 댓글 작성자
+                            model: User,
                             attributes: ['user_id', 'user_name', 'country'] 
                         }
                     },
                     {
-                        model: Like, // 좋아요 누른 사용자 목록 (좋아요 수 카운트용)
+                        model: Like,
                         attributes: ['user_id']
+                    },
+                    {
+                        model: Category,
+                        attributes: ['category_id', 'category_name']
                     }
-                ], 
-                order: [[Comment, 'created_at', 'ASC']], // 댓글은 오래된 순으로 정렬
-                where: category
-                
+                ],
+                order: [[Comment, 'created_at', 'ASC']]
             });
 
             if (!board) {
@@ -113,20 +113,15 @@ class BoardService {
     async updateBoard(boardId, userId, updateData) {
         try {
             const board = await Board.findByPk(boardId);
-
-            if (!board) {
-                throw new Error('게시글을 찾을 수 없습니다.');
-            }
-
-            if (board.user_id !== userId) {
-                throw new Error('게시글을 수정할 권한이 없습니다.');
-            }
-
+    
+            if (!board) throw new Error('게시글을 찾을 수 없습니다.');
+            if (board.user_id !== userId) throw new Error('게시글을 수정할 권한이 없습니다.');
+    
             board.title = updateData.title || board.title;
             board.content = updateData.content || board.content;
-            board.category = updateData.category || board.category; // category 필드 추가
+            board.category_id = updateData.categoryId || board.category_id;  // FK 수정
             await board.save();
-
+    
             return board;
         } catch (error) {
             console.error('게시글 수정 에러 : ', error);

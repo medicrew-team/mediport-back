@@ -1,6 +1,7 @@
 class BoardResponseDto {
-    constructor(board, author, commentCount = 0, likeCount = 0, comments = []) {
+    constructor(board, author,category ,commentCount = 0, likeCount = 0, comments = []) {
         this.board_id = board.board_id;
+        this.category = category;
         this.title = board.title;
         this.content = board.content;
         this.view = board.view;

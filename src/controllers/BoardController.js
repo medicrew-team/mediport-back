@@ -10,27 +10,28 @@ class BoardController {
     async createBoard(req, res, next) {
         try {
             const userId = req.user.uid;
-            const { title, content, category } = req.body;
-
-            // DTO를 사용하여 유효성 검사 및 데이터 캡슐화
-            const createBoardDto = new CreateBoardDto(title, content, category);
+            const { title, content, categoryId } = req.body;
+            const createBoardDto = new CreateBoardDto(title, content, categoryId);
             if (!createBoardDto.title || !createBoardDto.content) {
                 return res.status(400).json({ message: '제목과 내용은 필수입니다.' });
             }
-
+    
             const newBoard = await boardService.createBoard(userId, createBoardDto);
-            const boardResponse = new BoardResponseDto(newBoard, new authorDto(req.user)); // 작성자 정보 포함
-
+    
+            const author = new authorDto(req.user);
+            const categoryDto = newBoard.Category 
+                ? { id: newBoard.Category.category_id, name: newBoard.Category.category_name }
+                : null;
+    
+            const boardResponse = new BoardResponseDto(newBoard, author, categoryDto);
+    
             res.status(201).json({
                 message: '게시글이 성공적으로 생성되었습니다.',
                 board: boardResponse
             });
-            console.log("게시글 생성 성공: ", boardResponse);
         } catch (error) {
             console.error("게시글 생성 에러: ", error);
-            res.status(500).json({
-                message: error.message || '서버 에러'
-            });
+            res.status(500).json({ message: error.message || '서버 에러' });
         }
     }
 
@@ -47,13 +48,14 @@ class BoardController {
                 const author = board.User ? new authorDto(board.User) : null;
                 const commentCount = board.dataValues.commentCount || 0;
                 const likeCount = board.dataValues.likeCount || 0;
-                return new BoardResponseDto(board, author, commentCount, likeCount);
+                const categoryDto = board.Category ? { id: board.Category.category_id, name: board.Category.category_name } : null;
+                return new BoardResponseDto(board,author,categoryDto,commentCount,likeCount);
             });
 
             res.status(200).json({
                 message: '게시글 목록 조회 성공',
-                totalItems: count.length,
-                totalPages: Math.ceil(count.length / limit),
+                totalItems: Array.isArray(count) ? count.length : count,
+                totalPages: Math.ceil((Array.isArray(count) ? count.length : count) / limit),
                 currentPage: page,
                 boards: boardsResponse
             });
@@ -69,36 +71,39 @@ class BoardController {
     async getBoardById(req, res, next) {
         try {
             const { boardId } = req.params;
-            const { category } = req.query; 
-            const board = await boardService.getBoardById(boardId,category);
+            const board = await boardService.getBoardById(boardId);
+    
             const author = board.User ? new authorDto(board.User) : null;
             const commentCount = board.Comments ? board.Comments.length : 0;
             const likeCount = board.Likes ? board.Likes.length : 0;
-            const comments = board.Comments ? board.Comments.map(comment => new CommentResponseDto(comment, comment.User ? new authorDto(comment.User) : null)) : [];
-
-            const boardResponse = new BoardResponseDto(board, author, commentCount, likeCount, comments);
+            const comments = board.Comments
+                ? board.Comments.map(c => new CommentResponseDto(c, c.User ? new authorDto(c.User) : null))
+                : [];
+            const categoryDto = board.Category
+                ? { id: board.Category.category_id, name: board.Category.category_name }
+                : null;
+    
+            const boardResponse = new BoardResponseDto(board, author, categoryDto, commentCount, likeCount, comments);
+    
             res.status(200).json({
                 message: '게시글 상세 조회 성공',
                 board: boardResponse
             });
-            console.log("게시글 상세 조회 성공: ", boardResponse);
         } catch (error) {
             console.error("게시글 상세 조회 에러: ", error);
             const statusCode = error.message.includes('찾을 수 없습니다') ? 404 :
                                error.message.includes('권한이 없습니다') ? 403 : 500;
-            res.status(statusCode).json({
-                message: error.message || '서버 에러'
-            });
-        }l
+            res.status(statusCode).json({ message: error.message || '서버 에러' });
+        }
     }
 
     async updateBoard(req, res, next) {
         try {
             const { boardId } = req.params;
             const userId = req.user.uid;
-            const { title, content, category } = req.body;
-
-            const updateBoardDto = new UpdateBoardDto(title, content, category);
+            const { title, content, categoryId } = req.body;
+            
+            const updateBoardDto = new UpdateBoardDto(title, content, categoryId);
             if (!updateBoardDto.title || !updateBoardDto.content) {
                 return res.status(400).json({ message: '제목과 내용은 필수입니다.' });
             }
