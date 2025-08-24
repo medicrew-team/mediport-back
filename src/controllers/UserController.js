@@ -55,9 +55,10 @@ exports.getMedicationHistory = async (req, res, next) => {
 exports.updateMedicationHistory = async (req, res, next) => {
     try {
         const userId = req.user.uid; 
-        const { medi_name,start_name,end_name,status,dosage } = req.body;
-        const medications = new updateMedicationHistoryDto(medi_name,start_name,end_name,status,dosage); 
-        const updatedHistory = await UserService.updateMedicationHistory(userId, medications);
+        const { historyId } = req.params;
+        const { medi_name,start_date,end_date,status,dosage } = req.body;
+        const medications = new updateMedicationHistoryDto(medi_name,start_date,end_date,status,dosage); 
+        const updatedHistory = await UserService.updateMedicationHistory(userId, historyId, medications);
         const responseData = new MedicationHistoryResponseDto(updatedHistory);
         res.status(200).json({
             message: '복약 기록이 성공적으로 업데이트되었습니다.',
@@ -208,3 +209,46 @@ exports.deleteUserProfile = async (req, res, next) => {
         });
     }
 }
+
+/**
+ * 사용자의 복약 기록을 추가합니다.
+ */
+exports.addMedicationHistory = async (req, res, next) => {
+    try {
+        const userId = req.user.uid;
+        const { medi_name, start_date, end_date, status, dosage } = req.body;
+        const newMedicationDto = new updateMedicationHistoryDto(medi_name, start_date, end_date, status, dosage);
+        const newHistory = await UserService.addMedicationHistory(userId, newMedicationDto);
+        const responseData = new MedicationHistoryResponseDto(newHistory);
+        res.status(201).json({
+            message: '복약 기록이 성공적으로 추가되었습니다.',
+            newHistory: responseData
+        });
+        console.log("복약 기록 추가 성공: ", responseData);
+    } catch (error) {
+        console.error("복약 기록 추가 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};
+
+/**
+ * 특정 복약 기록을 삭제합니다.
+ */
+exports.deleteMedicationHistory = async (req, res, next) => {
+    try {
+        const userId = req.user.uid;
+        const { historyId } = req.params;
+        await UserService.deleteMedicationHistory(userId, historyId);
+        res.status(200).json({
+            message: '복약 기록이 성공적으로 삭제되었습니다.'
+        });
+        console.log(`복약 기록(ID: ${historyId}) 삭제 성공`);
+    } catch (error) {
+        console.error("복약 기록 삭제 에러: ", error);
+        res.status(500).json({
+            message: error.message || '서버 에러'
+        });
+    }
+};

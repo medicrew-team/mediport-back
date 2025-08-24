@@ -124,9 +124,9 @@ class UserService {
      * 복약 기록을 업데이트합니다.
      * kr_medi_id가 없는 경우 custom_name을 사용하고, kr_medi 정보는 null로 처리합니다.
      */
-    async updateMedicationHistory(userId, updateData) {
+    async updateMedicationHistory(userId, historyId, updateData) {
         try {
-            const history = await User_Medi_History.findAll({where: { user_id: userId }});
+            const history = await User_Medi_History.findByPk(historyId);
 
             if (!history) {
                 throw new Error('복약 기록을 찾을 수 없습니다.');
@@ -136,31 +136,107 @@ class UserService {
                 throw new Error('권한이 없습니다.');
             }
 
-            let krMediId = null;
-            let customName = null;
+            let krMediId = history.kr_medi_id;
+            let customName = history.custom_name;
 
             if (updateData.medi_name) {
                 const medi = await KrMedi.findOne({ where: { prod_name: updateData.medi_name } });
                 if (medi) {
                     krMediId = medi.kr_medi_id;
+                    customName = null; // DB에 약이 있으면 custom_name은 비워줍니다.
                 } else {
                     customName = updateData.medi_name; // DB에 없는 약은 custom_name에 저장
+                    krMediId = null; // custom_name을 사용하면 kr_medi_id는 비워줍니다.
                 }
             }
 
             history.kr_medi_id = krMediId;
             history.custom_name = customName;
             history.start_date = updateData.start_date || history.start_date;
-            history.end_date = updateData.end_date || history.end_date;
+            history.end_date = updateData.end_date === undefined ? history.end_date : updateData.end_date;
             history.status = updateData.status || history.status;
             history.dosage = updateData.dosage || history.dosage;
 
             await history.save();
 
-            return history;
+            // 저장 후 KrMedi 관계를 포함하여 다시 로드
+            const result = await User_Medi_History.findByPk(history.history_id, {
+                include: [{
+                    model: KrMedi,
+                    required: false // kr_medi가 없는 경우도 처리 (LEFT JOIN)
+                }]
+            });
+
+            return result;
         } catch (error) {
             console.error('복약 기록 업데이트 에러:', error);
             throw new Error(`복약 기록 업데이트 실패: ${error.message}`);
+        }
+    }
+
+    /**
+     * 복약 기록을 추가합니다.
+     */
+    async addMedicationHistory(userId, medicationData) {
+        try {
+            let krMediId = null;
+            let customName = null;
+
+            if (medicationData.medi_name) {
+                const medi = await KrMedi.findOne({ where: { prod_name: medicationData.medi_name } });
+                if (medi) {
+                    krMediId = medi.kr_medi_id;
+                } else {
+                    customName = medicationData.medi_name; // DB에 없는 약은 custom_name에 저장
+                }
+            }
+
+            const newHistory = await User_Medi_History.create({
+                user_id: userId,
+                kr_medi_id: krMediId,
+                custom_name: customName,
+                start_date: medicationData.start_date,
+                end_date: medicationData.end_date || null,
+                status: medicationData.status || '복용 중',
+                dosage: medicationData.dosage || null
+            });
+
+            // 생성 후 KrMedi 관계를 포함하여 다시 로드
+            const result = await User_Medi_History.findByPk(newHistory.history_id, {
+                include: [{
+                    model: KrMedi,
+                    required: false // kr_medi가 없는 경우도 처리 (LEFT JOIN)
+                }]
+            });
+
+            return result;
+        } catch (error) {
+            console.error('복약 기록 추가 에러:', error);
+            throw new Error(`복약 기록 추가 실패: ${error.message}`);
+        }
+    }
+
+    /**
+     * 특정 복약 기록을 삭제합니다.
+     */
+    async deleteMedicationHistory(userId, historyId) {
+        try {
+            const history = await User_Medi_History.findByPk(historyId);
+
+            if (!history) {
+                throw new Error('복약 기록을 찾을 수 없습니다.');
+            }
+
+            if (history.user_id !== userId) {
+                throw new Error('권한이 없습니다.');
+            }
+
+            await history.destroy();
+
+            return { success: true, message: '복약 기록이 성공적으로 삭제되었습니다.' };
+        } catch (error) {
+            console.error('복약 기록 삭제 에러:', error);
+            throw new Error(`복약 기록 삭제 실패: ${error.message}`);
         }
     }
     /**
