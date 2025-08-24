@@ -58,7 +58,7 @@ class BoardService {
                         attributes: []
                     }
                 ],
-                group: ['Board.board_id'],
+                group: ['board.board_id'],
                 order: [['created_at', 'DESC']],
                 offset: offset,
                 limit: limit,
