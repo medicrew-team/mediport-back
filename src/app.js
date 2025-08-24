@@ -11,6 +11,7 @@ const translateRoutes = require('./routes/translateRoutes');
 const similarRoutes = require('./routes/similarRoutes');
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
+const restrictRoutes = require('./routes/restrictRoutes');
 const { swaggerUi, specs } = require('./config/swaggerConfig'); // Swagger 설정 가져오기
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/api/translate', translateRoutes);
 app.use('/api/similar', similarRoutes);
 app.use('/api/prescription', prescriptionRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/restricts', restrictRoutes);
 
 
 // 기본 라우트 (루트 경로 접근 시)
