@@ -18,9 +18,9 @@ class BoardController {
     
             const newBoard = await boardService.createBoard(userId, createBoardDto);
     
-            const author = new authorDto(req.user);
-            const categoryDto = newBoard.Category 
-                ? { id: newBoard.Category.category_id, name: newBoard.Category.category_name }
+            const author = new authorDto(newBoard.user);
+            const categoryDto = newBoard.category 
+                ? { id: newBoard.category.category_id, name: newBoard.category.category_name}
                 : null;
     
             const boardResponse = new BoardResponseDto(newBoard, author, categoryDto);
@@ -45,10 +45,10 @@ class BoardController {
             const { count, rows } = await boardService.getBoards(page, limit, search, category);
 
             const boardsResponse = rows.map(board => {
-                const author = board.User ? new authorDto(board.User) : null;
+                const author = board.user ? new authorDto(board.user) : null;
                 const commentCount = board.dataValues.commentCount || 0;
                 const likeCount = board.dataValues.likeCount || 0;
-                const categoryDto = board.Category ? { id: board.Category.category_id, name: board.Category.category_name } : null;
+                const categoryDto = board.category ? { id: board.category.category_id, name: board.category.category_name } : null;
                 return new BoardResponseDto(board,author,categoryDto,commentCount,likeCount);
             });
 
@@ -73,14 +73,14 @@ class BoardController {
             const { boardId } = req.params;
             const board = await boardService.getBoardById(boardId);
     
-            const author = board.User ? new authorDto(board.User) : null;
-            const commentCount = board.Comments ? board.Comments.length : 0;
-            const likeCount = board.Likes ? board.Likes.length : 0;
-            const comments = board.Comments
-                ? board.Comments.map(c => new CommentResponseDto(c, c.User ? new authorDto(c.User) : null))
+            const author = board.user ? new authorDto(board.user) : null;
+            const commentCount = board.comments ? board.comments.length : 0;
+            const likeCount = board.likes ? board.likes.length : 0;
+            const comments = board.comments
+                ? board.comments.map(c => new CommentResponseDto(c, c.user ? new authorDto(c.user) : null))
                 : [];
-            const categoryDto = board.Category
-                ? { id: board.Category.category_id, name: board.Category.category_name }
+            const categoryDto = board.category
+                ? { id: board.category.category_id, name: board.category.category_name }
                 : null;
     
             const boardResponse = new BoardResponseDto(board, author, categoryDto, commentCount, likeCount, comments);
@@ -89,6 +89,8 @@ class BoardController {
                 message: '게시글 상세 조회 성공',
                 board: boardResponse
             });
+
+            console.log("게시글 상세 조회 성공: ", boardResponse);
         } catch (error) {
             console.error("게시글 상세 조회 에러: ", error);
             const statusCode = error.message.includes('찾을 수 없습니다') ? 404 :
@@ -102,14 +104,14 @@ class BoardController {
             const { boardId } = req.params;
             const userId = req.user.uid;
             const { title, content, categoryId } = req.body;
-            
+
             const updateBoardDto = new UpdateBoardDto(title, content, categoryId);
             if (!updateBoardDto.title || !updateBoardDto.content) {
                 return res.status(400).json({ message: '제목과 내용은 필수입니다.' });
             }
 
             const updatedBoard = await boardService.updateBoard(boardId, userId, updateBoardDto);
-            const boardResponse = new BoardResponseDto(updatedBoard, new authorDto(req.user)); // 작성자 정보 포함
+            const boardResponse = new BoardResponseDto(updatedBoard, new authorDto(updatedBoard.user)); // 작성자 정보 포함
 
             res.status(200).json({
                 message: '게시글이 성공적으로 수정되었습니다.',
@@ -158,7 +160,7 @@ class BoardController {
             const newComment = await boardService.createComment(boardId, userId, content);
 
             // CommentResponseDto 적용
-            const author = req.user ? new authorDto(req.user) : null; // req.user는 Firebase decoded token
+            const author = newComment.user ? new authorDto(newComment.user) : null; // req.user는 Firebase decoded token
             const commentResponse = new CommentResponseDto(newComment, author);
             res.status(201).json({
                 message: '댓글이 성공적으로 생성되었습니다.',
@@ -186,7 +188,7 @@ class BoardController {
             const updatedComment = await boardService.updateComment(boardId, commentId, userId, content);
 
             // CommentResponseDto 적용
-            const author = req.user ? new authorDto(req.user) : null; // req.user는 Firebase decoded token
+            const author = updatedComment.user ? new authorDto(updatedComment.user) : null; // req.user는 Firebase decoded token
             const commentResponse = new CommentResponseDto(updatedComment, author);
             res.status(200).json({
                 message: '댓글이 성공적으로 수정되었습니다.',

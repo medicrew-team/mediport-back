@@ -1,8 +1,8 @@
 class CreateBoardDto {
-    constructor(title, content, category) {
+    constructor(title, content, categoryId) {
         this.title = title;
         this.content = content;
-        this.category = category;
+        this.categoryId = categoryId;
     }
 }
 

@@ -61,16 +61,16 @@ const options = {
           properties: {
             title: { type: 'string' },
             content: { type: 'string' },
-            category: { type: 'string' },
+            categoryId: { type: 'integer', description: 'The ID of the category' },
           },
-          required: ['title', 'content'],
+          required: ['title', 'content', 'categoryId'],
         },
         UpdateBoardDto: {
           type: 'object',
           properties: {
             title: { type: 'string' },
             content: { type: 'string' },
-            category: { type: 'string' },
+            categoryId: { type: 'integer', description: 'The ID of the category' },
           },
         },
         BoardResponseDto: {
@@ -83,6 +83,7 @@ const options = {
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
             author: { '$ref': '#/components/schemas/authorDto' },
+            category: { '$ref': '#/components/schemas/CategoryDto' },
             commentCount: { type: 'integer' },
             likeCount: { type: 'integer' },
             comments: {
@@ -91,6 +92,13 @@ const options = {
                 '$ref': '#/components/schemas/CommentResponseDto'
               }
             }
+          }
+        },
+        CategoryDto: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' }
           }
         },
         CommentResponseDto: {
@@ -106,9 +114,9 @@ const options = {
         authorDto: {
           type: 'object',
           properties: {
-            id: { type: 'integer' },
+            id: { type: 'string', description: "User's Firebase UID" },
             nickname: { type: 'string' },
-            profileImage: { type: 'string', format: 'uri' },
+            user_img: { type: 'string', format: 'uri', nullable: true },
             country: { type: 'string' },
             region: { type: 'string' }
           }
