@@ -253,7 +253,7 @@ class UserService {
             const user = await User.findByPk(user_id, {
                 include: [{
                     model: Disease,
-                    as: 'Diseases',
+                    as: 'Disease',
                     attributes: ['disease_id', 'disease_name'],
                     through: { attributes: [] }
                 }]

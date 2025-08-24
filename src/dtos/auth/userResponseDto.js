@@ -21,6 +21,7 @@ class UserResponseDto {
             dosage: m.dosage
         })) : [];
         this.user_img = user.user_img || null; // 기본값으로 null 설정
+        this.language = user.language || 'ko'; // 기본값으로 'ko' 설정
     }
 }
 
