@@ -11,42 +11,66 @@ const { verifyToken } = require('../middleware/authMiddleware');
  */
 
 
+
 /**
  * @swagger
  * /api/boards:
  *   get:
- *     summary: 모든 게시글 조회
+ *     summary: 게시글 목록 조회
  *     tags: [board]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: 제목/내용 부분 일치 검색
+ *       - in: query
+ *         name: categoryId    
+ *         schema:
+ *           type: integer
+ *         description: 카테고리 ID로 필터
  *     responses:
  *       200:
  *         description: 게시글 목록 조회 성공
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/BoardResponseDto'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 게시글 목록 조회 성공
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 42
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 boards:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/BoardResponseDto'
+ *       401:
+ *         description: 인증 실패
+ *       500:
+ *         description: 서버 에러
  */
-/**
- * @swagger
- * /api/boards:
- *   get:
- *     summary: 모든 게시글 조회
- *     tags: [board]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: 게시글 목록 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/BoardResponseDto'
- */
+
 router.get('/',verifyToken ,boardController.getBoards);
 /**
  * @swagger
@@ -99,6 +123,7 @@ router.get('/',verifyToken ,boardController.getBoards);
 router.post('/', verifyToken, boardController.createBoard);
 
 
+
 /**
  * @swagger
  * /api/boards/{boardId}:
@@ -114,31 +139,11 @@ router.post('/', verifyToken, boardController.createBoard);
  *         schema:
  *           type: integer
  *         description: 게시글 ID
- *     responses:
- *       200:
- *         description: 게시글 조회 성공
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/BoardResponseDto'
- *       404:
- *         description: 게시글을 찾을 수 없음
- */
-/**
- * @swagger
- * /api/boards/{boardId}:
- *   get:
- *     summary: 특정 게시글 조회
- *     tags: [board]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: boardId
- *         required: true
+ *       - in: query
+ *         name: categoryId    
  *         schema:
  *           type: integer
- *         description: 게시글 ID
+ *         description: 카테고리 ID로 필터 
  *     responses:
  *       200:
  *         description: 게시글 조회 성공
@@ -150,39 +155,7 @@ router.post('/', verifyToken, boardController.createBoard);
  *         description: 게시글을 찾을 수 없음
  */
 router.get('/:boardId',verifyToken ,boardController.getBoardById);
-/**
- * @swagger
- * /api/boards/{boardId}:
- *   put:
- *     summary: 특정 게시글 업데이트
- *     tags: [board]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: boardId
- *         required: true
- *         schema:
- *           type: integer
- *         description: 게시글 ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateBoardDto'
- *     responses:
- *       200:
- *         description: 게시글 업데이트 성공
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/BoardResponseDto'
- *       400:
- *         description: 잘못된 요청
- *       404:
- *         description: 게시글을 찾을 수 없음
- */
+
 /**
  * @swagger
  * /api/boards/{boardId}:

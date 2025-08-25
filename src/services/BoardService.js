@@ -32,96 +32,115 @@ class BoardService {
     }
 
     async getBoards(page, limit, search, categoryId) {
-        try {
-            const offset = (page - 1) * limit;
-            const whereClause = {};
-    
-            if (search) {
-                whereClause[Op.or] = [
-                    { title: { [Op.like]: `%${search}%` } },
-                    { content: { [Op.like]: `%${search}%` } }
-                ];
-            }
-    
-            if (categoryId) {
-                whereClause.category_id = categoryId;  // FK 기준으로 검색
-            }
-    
-            const boards = await Board.findAndCountAll({
-                where: whereClause,
-                attributes: {
-                    include: [
-                        [sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("comments.comment_id"))), "commentCount"],
-                        [sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("likes.like_id"))), "likeCount"]
-                    ]
-                },
-                include: [
-                    {
-                        model: User,
-                        attributes: ['user_id', 'nickname', 'country', 'user_img', 'region']
-                    },
-                    { model: Comment, attributes: [] },
-                    { model: Like, attributes: [] },
-                    { model: Category, attributes: ['category_id', 'category_name'] }
-                ],
-                group: ['board.board_id'],
-                order: [['created_at', 'DESC']],
-                offset,
-                limit,
-                subQuery: false
-            });
-    
-            return boards;
-        } catch (error) {
-            console.error('게시글 목록 조회 에러 : ', error);
-            throw new Error(`게시글 목록 조회 실패: ${error.message}`);
+        const offset = (page - 1) * limit;
+        const whereClause = {};
+      
+        if (search) {
+          whereClause[Op.or] = [
+            { title: { [Op.like]: `%${search}%` } },
+            { content: { [Op.like]: `%${search}%` } },
+          ];
         }
-    }
-
-    async getBoardById(boardId) {
-        try {
-            const board = await Board.findOne({
-                where: { board_id: boardId },
-                include: [
-                    {
-                        model: User,
-                        attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ]
-                    },
-                    {
-                        model: Comment,
-                        include: {
-                            model: User,
-                            attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] 
-                        }
-                    },
-                    {
-                        model: Like,
-                        include: {
-                            model: User,
-                            attributes: ['user_id', 'nickname','email', 'phone', 'country','region','user_img' ] 
-                        }
-                    },
-                    {
-                        model: Category,
-                        attributes: ['category_id', 'category_name']
-                    }
-                ],
-                order: [[Comment, 'created_at', 'ASC']]
-            });
-
-            if (!board) {
-                throw new Error('게시글을 찾을 수 없습니다.');
-            }
-
-            // 조회수 1 증가
-            await board.increment('view');
-
-            return board;
-        } catch (error) {
-            console.error('게시글 상세 조회 에러 : ', error);
-            throw new Error(`게시글 상세 조회 실패: ${error.message}`);
+      
+        // 기본 include
+        const includes = [
+          { model: User, attributes: ['user_id','nickname','country','user_img','region'] },
+          { model: Comment, attributes: [] },
+          { model: Like, attributes: [] },
+        ];
+      
+        // ✅ 카테고리 필터를 include에 넣고 INNER JOIN 강제
+        if (categoryId !== null && Number.isInteger(Number(categoryId))) {
+          includes.push({
+            model: Category,
+            attributes: ['category_id','category_name'],
+            where: { category_id: Number(categoryId) },
+            required: true, // <-- 이게 포인트 (INNER JOIN)
+          });
+        } else {
+          includes.push({
+            model: Category,
+            attributes: ['category_id','category_name'],
+            required: false,
+          });
         }
-    }
+      
+        const rows = await Board.findAll({
+          where: whereClause,
+          attributes: {
+            include: [
+              [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('comments.comment_id'))), 'commentCount'],
+              [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('likes.like_id'))), 'likeCount'],
+            ],
+          },
+          include: includes,
+          group: ['board.board_id','user.user_id','category.category_id'],
+          order: [['created_at','DESC']],
+          offset,
+          limit,
+          subQuery: false,
+        });
+      
+        // total 은 조인 없이 깔끔하게
+        const totalItems = await Board.count({
+          where: categoryId ? { ...whereClause, category_id: Number(categoryId) } : whereClause,
+          distinct: true,
+          col: 'board.board_id',
+        });
+      
+        return { rows, count: totalItems };
+      }
+
+      async getBoardById(boardId, categoryId) {
+        try {
+          const whereClause = {
+            board_id: Number(boardId),
+            ...(categoryId !== undefined && categoryId !== null && categoryId !== '' 
+                ? { category_id: Number(categoryId) } 
+                : {})
+          };
+      
+          const board = await Board.findOne({
+            where: whereClause,                         // ✅ 단건 + 카테고리 일치 보장
+            include: [
+              {
+                model: User,
+                attributes: ['user_id','nickname','email','phone','country','region','user_img']
+              },
+              {
+                model: Comment,
+                include: {
+                  model: User,
+                  attributes: ['user_id','nickname','email','phone','country','region','user_img']
+                }
+              },
+              {
+                model: Like,
+                include: {
+                  model: User,
+                  attributes: ['user_id','nickname','email','phone','country','region','user_img']
+                }
+              },
+              {
+                model: Category,
+                attributes: ['category_id','category_name']
+              }
+            ],
+            order: [[Comment, 'created_at', 'ASC']]
+          });
+      
+          if (!board) {
+            // 카테고리까지 함께 필터했을 때 미일치면 여기서 404
+            throw new Error('게시글을 찾을 수 없습니다.');
+          }
+      
+          await board.increment('view');
+          return board;
+        } catch (error) {
+          console.error('게시글 상세 조회 에러 : ', error);
+          throw new Error(`게시글 상세 조회 실패: ${error.message}`);
+        }
+      }
 
     async updateBoard(boardId, userId, updateData) {
         try {

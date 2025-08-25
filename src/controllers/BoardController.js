@@ -40,9 +40,8 @@ class BoardController {
             const page = parseInt(req.query.page, 10) || 1;
             const limit = parseInt(req.query.limit, 10) || 10;
             const search = req.query.search || null;
-            const category = req.query.category || null;
-
-            const { count, rows } = await boardService.getBoards(page, limit, search, category);
+            const categoryId = req.query.categoryId ? Number(req.query.categoryId) : null;
+            const { count, rows } = await boardService.getBoards(page, limit, search, categoryId);
 
             const boardsResponse = rows.map(board => {
                 const author = board.user ? new authorDto(board.user) : null;
@@ -71,7 +70,8 @@ class BoardController {
     async getBoardById(req, res, next) {
         try {
             const { boardId } = req.params;
-            const board = await boardService.getBoardById(boardId);
+            const categoryId = req.query.categoryId ? Number(req.query.categoryId) : null;
+            const board = await boardService.getBoardById(boardId,categoryId);
     
             const author = board.user ? new authorDto(board.user) : null;
             const commentCount = board.comments ? board.comments.length : 0;
