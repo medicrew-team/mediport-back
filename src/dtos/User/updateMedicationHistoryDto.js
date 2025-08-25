@@ -1,5 +1,6 @@
 class updateMedicationHistoryDto {
-    constructor(medi_name,start_date,end_date,status,dosage) {
+    constructor(historyId,medi_name,start_date,end_date,status,dosage) {
+        this.historyId = historyId;
         this.medi_name = medi_name;
         this.start_date = start_date;
         this.end_date = end_date;

@@ -212,6 +212,7 @@ class UserService {
             return result;
         } catch (error) {
             console.error('복약 기록 추가 에러:', error);
+            console.log("medicationData:",medicationData);
             throw new Error(`복약 기록 추가 실패: ${error.message}`);
         }
     }
@@ -236,6 +237,7 @@ class UserService {
             return { success: true, message: '복약 기록이 성공적으로 삭제되었습니다.' };
         } catch (error) {
             console.error('복약 기록 삭제 에러:', error);
+            console.log("historyId:",historyId);
             throw new Error(`복약 기록 삭제 실패: ${error.message}`);
         }
     }
