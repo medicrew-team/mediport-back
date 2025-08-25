@@ -76,5 +76,50 @@ const { verifyToken } = require('../middleware/authMiddleware');
  *         description: 서버 에러
  */
 router.get('/', verifyToken, restrictController.getRestrictedMedis);
+
+
+/**
+ * @swagger
+ * /api/restricts/{id}:
+ *   get:
+ *     summary: 특정 제한 약물 조회
+ *     description: ID로 제한 약물을 조회합니다.
+ *     tags: [Restrict]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 제한 약물 ID
+ *     responses:
+ *       200:
+ *         description: 제한 약물 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 제한 약물 조회 성공
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     restricted_medi_id:
+ *                       type: integer
+ *                     prod_name:
+ *                       type: string
+ *                     ing_name:
+ *                       type: string
+ *                     company_name:
+ *                       type: string
+ *       401:
+ *         description: 인증 실패
+ *       500:
+ *         description: 서버 에러
+ */
 router.get('/:id', verifyToken, restrictController.getRestrictedMediById);
 module.exports = router;
