@@ -77,6 +77,12 @@ exports.parseImage = async( file, id ) => {
                 location: row.purchase_loc,
                 dosage: row.dosage,
                 image: row.prod_img,
+                bit: row.bit, 
+                contraindicated: row.contraindicated, 
+                storage_method: row.storage_method,
+                daily_interaction: row.daily_interaction,
+                drug_interaction: row.drug_interaction,
+                adverse_reaction: row.adverse_reaction
               },
               ocrInfo: mapped // {투약량, 횟수, 일수}
             };
@@ -107,10 +113,17 @@ exports.parseImage = async( file, id ) => {
               // dbInfo 내부 번역
               translatedItem.dbInfo = {
                 ...item.dbInfo,
-                form:       await exports.translateWithCache(item.dbInfo.form, target_lang),
-                icd_sum:    await exports.translateWithCache(item.dbInfo.icd_sum, target_lang),
-                location:   await exports.translateWithCache(item.dbInfo.location, target_lang),
-                dosage:     await exports.translateWithCache(item.dbInfo.dosage, target_lang),
+                form             : await exports.translateWithCache(item.dbInfo.form, target_lang),
+                icd_sum          : await exports.translateWithCache(item.dbInfo.icd_sum, target_lang),
+                location         : await exports.translateWithCache(item.dbInfo.location, target_lang),
+                dosage           : await exports.translateWithCache(item.dbInfo.dosage, target_lang),
+                purchase_loc     : await exports.translateWithCache(item.dbInfo.purchase_loc, target_lang),
+                bit              : await exports.translateWithCache(item.dbInfo.bit, target_lang),
+                contraindicated  : await exports.translateWithCache(item.dbInfo.contraindicated, target_lang),
+                dostorage_method : await exports.translateWithCache(item.dbInfo.storage_method, target_lang),
+                daily_interaction:await exports.translateWithCache(item.dbInfo.daily_interaction, target_lang),
+                drug_interaction :await exports.translateWithCache(item.dbInfo.drug_interaction , target_lang),
+                adverse_reaction :await exports.translateWithCache(item.dbInfo.adverse_reaction, target_lang),
                 image: item.dbInfo.image // URL은 번역 필요 없음
               };
 
