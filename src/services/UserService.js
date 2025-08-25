@@ -124,9 +124,9 @@ class UserService {
      * 복약 기록을 업데이트합니다.
      * kr_medi_id가 없는 경우 custom_name을 사용하고, kr_medi 정보는 null로 처리합니다.
      */
-    async updateMedicationHistory(userId, historyId, updateData) {
+    async updateMedicationHistory(userId, updateData) {
         try {
-            const history = await User_Medi_History.findByPk(historyId);
+            const history = await User_Medi_History.findByPk(updateData.historyId);
 
             if (!history) {
                 throw new Error('복약 기록을 찾을 수 없습니다.');
