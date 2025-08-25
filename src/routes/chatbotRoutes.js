@@ -13,7 +13,7 @@ const multer = require('multer');
 
 /**
  * @swagger
- * api/chatbot/recommand-medicine:
+ * /api/chatbot/recommand-medicine:
  *   post:
  *     summary: 텍스트 입력 후 챗봇 답변 반환
  *     tags: [chatbot]
