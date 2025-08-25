@@ -57,8 +57,8 @@ exports.updateMedicationHistory = async (req, res, next) => {
         const userId = req.user.uid; 
         const { historyId } = req.params;
         const { medi_name,start_date,end_date,status,dosage } = req.body.history;
-        const medications = new updateMedicationHistoryDto(medi_name,start_date,end_date,status,dosage); 
-        const updatedHistory = await UserService.updateMedicationHistory(userId, historyId, medications);
+        const medications = new updateMedicationHistoryDto(historyId,medi_name,start_date,end_date,status,dosage); 
+        const updatedHistory = await UserService.updateMedicationHistory(userId, medications);
         const responseData = new MedicationHistoryResponseDto(updatedHistory);
         res.status(200).json({
             message: '복약 기록이 성공적으로 업데이트되었습니다.',
