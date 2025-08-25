@@ -46,7 +46,7 @@ const upload = multer({
 
 /**
  * @swagger
- * /similar/foreign-medicine/image:
+ * api/similar/foreign-medicine/image:
  *   post:
  *     summary: 이미지 업로드 후 OCR 결과 반환
  *     tags: [similar]
@@ -107,7 +107,7 @@ router.post('/foreign-medicine/image',verifyToken ,upload.single('file'), simila
 
 /**
  * @swagger
- * /similar/foreign-medicine/text:
+ * api/similar/foreign-medicine/text:
  *   post:
  *     summary: 텍스트 입력 후 처리 결과 반환
  *     tags: [similar]
