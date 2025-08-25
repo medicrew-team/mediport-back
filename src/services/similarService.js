@@ -88,6 +88,12 @@ exports.parseImage = async( file, id ) => {
             translatedItem.icd_sum = await exports.translateWithCache(item.icd_sum, target_lang);
             translatedItem.dosage = await exports.translateWithCache(item.dosage, target_lang);
             translatedItem.purchase_loc = await exports.translateWithCache(item.purchase_loc, target_lang);
+            translatedItem.bit = await exports.translateWithCache(item.bit, target_lang);
+            translatedItem.contraindicated = await exports.translateWithCache(item.contraindicated, target_lang);
+            translatedItem.storage_method = await exports.translateWithCache(item.storage_method, target_lang);
+            translatedItem.daily_interaction = await exports.translateWithCache(item.daily_interaction, target_lang);
+            translatedItem.drug_interaction = await exports.translateWithCache(item.drug_interaction, target_lang);
+            translatedItem.adverse_reaction = await exports.translateWithCache(item.adverse_reaction, target_lang);
 
             return translatedItem;
         }));
@@ -139,6 +145,12 @@ exports.parseText = async ( text, id ) => {
             translatedItem.icd_sum = await exports.translateWithCache(item.icd_sum, target_lang);
             translatedItem.dosage = await exports.translateWithCache(item.dosage, target_lang);
             translatedItem.purchase_loc = await exports.translateWithCache(item.purchase_loc, target_lang);
+            translatedItem.bit = await exports.translateWithCache(item.bit, target_lang);
+            translatedItem.contraindicated = await exports.translateWithCache(item.contraindicated, target_lang);
+            translatedItem.storage_method = await exports.translateWithCache(item.storage_method, target_lang);
+            translatedItem.daily_interaction = await exports.translateWithCache(item.daily_interaction, target_lang);
+            translatedItem.drug_interaction = await exports.translateWithCache(item.drug_interaction, target_lang);
+            translatedItem.adverse_reaction = await exports.translateWithCache(item.adverse_reaction, target_lang);
 
             return translatedItem;
         }));

@@ -13,7 +13,13 @@ const parseImage = `
          km.icd_sum,
          km.purchase_loc,
          km.dosage,
-         km.prod_img
+         km.prod_img,
+	       km.bit,
+         km.contraindicated,
+         km.storage_method,
+         km.daily_interaction,
+         km.drug_interaction,
+         km.adverse_reaction
   FROM kr_medi km
   JOIN international_medi im 
     ON km.prod_name COLLATE utf8mb4_general_ci 
@@ -22,14 +28,21 @@ const parseImage = `
        = im.realsame COLLATE utf8mb4_general_ci
   WHERE im.prod_name = :ocr COLLATE utf8mb4_general_ci;
 `;
+//contraindicated부터 상세페이지
 
 const parseText = `
-  SELECT distinct km.prod_name,
+    SELECT distinct km.prod_name,
          km.medi_form,
          km.icd_sum,
          km.purchase_loc,
          km.dosage,
-         km.prod_img
+         km.prod_img,
+	       km.bit,
+         km.contraindicated,
+         km.storage_method,
+         km.daily_interaction,
+         km.drug_interaction,
+         km.adverse_reaction
   FROM kr_medi km
   JOIN international_medi im 
     ON km.prod_name COLLATE utf8mb4_general_ci 
@@ -38,7 +51,7 @@ const parseText = `
        = im.realsame COLLATE utf8mb4_general_ci
   WHERE im.prod_name = :text COLLATE utf8mb4_general_ci;
 `;
-
+//contraindicated부터 상세페이지
 
 const parseKrImage = `
   SELECT prod_name,
@@ -46,10 +59,17 @@ const parseKrImage = `
          icd_sum,
          purchase_loc,
          dosage,
-         prod_img
+         prod_img,
+         bit, 
+         contraindicated, 
+         storage_method,
+         daily_interaction,
+         drug_interaction,
+         adverse_reaction
   FROM kr_medi
   WHERE prod_name COLLATE utf8mb4_general_ci IN (?);
 `;
+//contraindicated부터 상세페이지
 
 const getLang = `
   SELECT language 
