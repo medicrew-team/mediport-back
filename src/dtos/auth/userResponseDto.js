@@ -14,6 +14,7 @@ class UserResponseDto {
             id: d.disease_id
         })) : []
         this.history = user.UserMediHistories ? user.UserMediHistories.map(m => ({
+            history_id: m.history_id,
             name: m.KrMedi ? m.KrMedi.prod_name : m.custom_name,
             start_date: m.start_date,
             end_date: m.end_date,

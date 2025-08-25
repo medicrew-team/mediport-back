@@ -216,9 +216,10 @@ exports.deleteUserProfile = async (req, res, next) => {
 exports.addMedicationHistory = async (req, res, next) => {
     try {
         const userId = req.user.uid;
-        const { medi_name, start_date, end_date, status, dosage } = req.body.history;
+        const { historyId,medi_name, start_date, end_date, status, dosage } = req.body.history;
         console.log("req.body:",req.body)
-        const newMedicationDto = new updateMedicationHistoryDto(medi_name, start_date, end_date, status, dosage);
+        const newMedicationDto = new updateMedicationHistoryDto(historyId,medi_name, start_date, end_date, status, dosage);
+        console.log("newMedicationDto:",newMedicationDto);
         const newHistory = await UserService.addMedicationHistory(userId, newMedicationDto);
         const responseData = new MedicationHistoryResponseDto(newHistory);
         res.status(201).json({
