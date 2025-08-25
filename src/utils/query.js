@@ -51,7 +51,11 @@ const parseKrImage = `
   WHERE prod_name COLLATE utf8mb4_general_ci IN (?);
 `;
 
-
+const getLang = `
+  SELECT language 
+  FROM \`user\`
+  WHERE user_id COLLATE utf8mb4_general_ci IN (?);
+`
 
 // CommonJS 방식으로 내보내기
 module.exports = {
@@ -59,4 +63,5 @@ module.exports = {
   parseImage,
   parseText,
   parseKrImage,
+  getLang,
 };

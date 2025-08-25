@@ -40,7 +40,7 @@ exports.translateWithCache = async ( text, targetLanguage ) => {
     }
 };
 
-exports.parseImage = async( file, target_lang='ko' ) => {
+exports.parseImage = async( file, id ) => {
     if ( !file ) throw new Error('file is required');
     
     try{
@@ -56,15 +56,10 @@ exports.parseImage = async( file, target_lang='ko' ) => {
         const { foreign_medicine_names = [] } = data || {};
         const ocrText = foreign_medicine_names.find(s => !!(s && s.trim()))?.trim();
 
-        console.log('3.ocrText:', ocrText);
-        if (!ocrText) {
-          throw new Error ( '의약품명을 추출하지 못했습니다.' );
-        }
-        
-        if (!ocrText) {
-          throw new Error ( '의약품명을 추출하지 못했습니다.' );
-        }
 
+        if (!ocrText) {
+          throw new Error ( '의약품명을 추출하지 못했습니다.' );
+        }
 
         const [result] = await db.execute(query.parseImage, { ocr: ocrText });
 
@@ -76,6 +71,11 @@ exports.parseImage = async( file, target_lang='ko' ) => {
             console.warn('Result is not an array, converting to array:', dataToProcess);
             dataToProcess = [dataToProcess];
         }
+
+        const [rows] = await db.query(query.getLang, [ id ]);
+        const target_lang = rows[0]?.language;
+
+
         // 한국어 요청 시 원본 반환
         if (target_lang !=='ko') {
         
@@ -109,7 +109,7 @@ exports.parseImage = async( file, target_lang='ko' ) => {
 
 
 
-exports.parseText = async ( text, target_lang='ko' ) => {
+exports.parseText = async ( text, id ) => {
     if ( !text ) throw new Error('text is required');
 
     try{
@@ -123,6 +123,10 @@ exports.parseText = async ( text, target_lang='ko' ) => {
             console.warn('Result is not an array, converting to array:', dataToProcess);
             dataToProcess = [dataToProcess];
         }
+
+        const [rows] = await db.query(query.getLang, [ id ]);
+        const target_lang = rows[0]?.language;
+    
         // 한국어 요청 시 원본 반환
         if (target_lang !=='ko') {
         

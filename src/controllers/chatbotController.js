@@ -4,14 +4,14 @@ const fs = require('fs/promises');
 
 exports.chatbot = async ( req, res ) => {
         const user_input = req.body.user_input;
-        const target_lang = req.body.lang;
+        const id = req.user.uid;
             
     try {
         if (!user_input) {
         return res.status(400).json({ message: 'text 필드가 필요합니다.' });
         }
 
-        const result = await chatbotService.chatbot( user_input, target_lang );
+        const result = await chatbotService.chatbot( user_input, id );
 
         return res.status(200).json( result );
 

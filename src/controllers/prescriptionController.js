@@ -3,14 +3,14 @@ const fs = require('fs/promises');
 
 exports.parseImage = async ( req, res ) => {
         const file = req.file;
-        const target_lang = req.body.lang;
+        const id = req.user.uid;
         
     try {
         if (!file) {
         return res.status(400).json({ message: 'file 필드가 필요합니다.' });
         }
 
-        const result = await prescriptionService.parseImage( file, target_lang );
+        const result = await prescriptionService.parseImage( file, id );
 
         return res.status(200).json( result );
 
