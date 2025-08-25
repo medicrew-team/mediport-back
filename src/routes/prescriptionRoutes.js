@@ -46,7 +46,7 @@ const upload = multer({
 
 /**
  * @swagger
- * /korean-medicine/image:
+ * api/prescription/korean-medicine/image:
  *   post:
  *     summary: 이미지 업로드 후 OCR 결과 반환
  *     tags: [prescription]
