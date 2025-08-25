@@ -103,7 +103,7 @@ const upload = multer({
  *       500:
  *         description: 서버 오류
  */
-router.post('/foreign-medicine/image', upload.single('file'), similarController.parseImage)
+router.post('/foreign-medicine/image',verifyToken ,upload.single('file'), similarController.parseImage)
 
 /**
  * @swagger
@@ -164,7 +164,7 @@ router.post('/foreign-medicine/image', upload.single('file'), similarController.
  *       500:
  *         description: 서버 오류
  */
-router.post('/foreign-medicine/text', similarController.parseText)
+router.post('/foreign-medicine/text', verifyToken, similarController.parseText)
 
 
 module.exports = router;

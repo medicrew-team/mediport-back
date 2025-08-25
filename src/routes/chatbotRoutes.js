@@ -70,6 +70,6 @@ const multer = require('multer');
  *       500:
  *         description: 서버 오류
  */
-router.post('/recommand-medicine', chatbotController.chatbot)
+router.post('/recommand-medicine', verifyToken, chatbotController.chatbot)
 
 module.exports = router;

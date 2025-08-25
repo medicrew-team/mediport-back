@@ -101,6 +101,6 @@ const upload = multer({
  *       500:
  *         description: 서버 오류
  */
-router.post('/korean-medicine/image', upload.single('file'), prescriptionController.parseImage)
+router.post('/korean-medicine/image', verifyToken, upload.single('file'), prescriptionController.parseImage)
 
 module.exports = router;

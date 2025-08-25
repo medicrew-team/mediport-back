@@ -40,7 +40,7 @@ exports.translateWithCache = async ( text, targetLanguage ) => {
     }
 };
 
-exports.parseImage = async( file, target_lang='ko' ) => {
+exports.parseImage = async( file, id ) => {
     if ( !file ) throw new Error('file is required');
     
     try{
@@ -56,15 +56,10 @@ exports.parseImage = async( file, target_lang='ko' ) => {
         const { foreign_medicine_names = [] } = data || {};
         const ocrText = foreign_medicine_names.find(s => !!(s && s.trim()))?.trim();
 
-        console.log('3.ocrText:', ocrText);
-        if (!ocrText) {
-          throw new Error ( '의약품명을 추출하지 못했습니다.' );
-        }
-        
-        if (!ocrText) {
-          throw new Error ( '의약품명을 추출하지 못했습니다.' );
-        }
 
+        if (!ocrText) {
+          throw new Error ( '의약품명을 추출하지 못했습니다.' );
+        }
 
         const [result] = await db.execute(query.parseImage, { ocr: ocrText });
 
@@ -76,6 +71,11 @@ exports.parseImage = async( file, target_lang='ko' ) => {
             console.warn('Result is not an array, converting to array:', dataToProcess);
             dataToProcess = [dataToProcess];
         }
+
+        const [rows] = await db.query(query.getLang, [ id ]);
+        const target_lang = rows[0]?.language;
+
+
         // 한국어 요청 시 원본 반환
         if (target_lang !=='ko') {
         
@@ -88,6 +88,12 @@ exports.parseImage = async( file, target_lang='ko' ) => {
             translatedItem.icd_sum = await exports.translateWithCache(item.icd_sum, target_lang);
             translatedItem.dosage = await exports.translateWithCache(item.dosage, target_lang);
             translatedItem.purchase_loc = await exports.translateWithCache(item.purchase_loc, target_lang);
+            translatedItem.bit = await exports.translateWithCache(item.bit, target_lang);
+            translatedItem.contraindicated = await exports.translateWithCache(item.contraindicated, target_lang);
+            translatedItem.storage_method = await exports.translateWithCache(item.storage_method, target_lang);
+            translatedItem.daily_interaction = await exports.translateWithCache(item.daily_interaction, target_lang);
+            translatedItem.drug_interaction = await exports.translateWithCache(item.drug_interaction, target_lang);
+            translatedItem.adverse_reaction = await exports.translateWithCache(item.adverse_reaction, target_lang);
 
             return translatedItem;
         }));
@@ -109,7 +115,7 @@ exports.parseImage = async( file, target_lang='ko' ) => {
 
 
 
-exports.parseText = async ( text, target_lang='ko' ) => {
+exports.parseText = async ( text, id ) => {
     if ( !text ) throw new Error('text is required');
 
     try{
@@ -123,6 +129,10 @@ exports.parseText = async ( text, target_lang='ko' ) => {
             console.warn('Result is not an array, converting to array:', dataToProcess);
             dataToProcess = [dataToProcess];
         }
+
+        const [rows] = await db.query(query.getLang, [ id ]);
+        const target_lang = rows[0]?.language;
+    
         // 한국어 요청 시 원본 반환
         if (target_lang !=='ko') {
         
@@ -135,6 +145,12 @@ exports.parseText = async ( text, target_lang='ko' ) => {
             translatedItem.icd_sum = await exports.translateWithCache(item.icd_sum, target_lang);
             translatedItem.dosage = await exports.translateWithCache(item.dosage, target_lang);
             translatedItem.purchase_loc = await exports.translateWithCache(item.purchase_loc, target_lang);
+            translatedItem.bit = await exports.translateWithCache(item.bit, target_lang);
+            translatedItem.contraindicated = await exports.translateWithCache(item.contraindicated, target_lang);
+            translatedItem.storage_method = await exports.translateWithCache(item.storage_method, target_lang);
+            translatedItem.daily_interaction = await exports.translateWithCache(item.daily_interaction, target_lang);
+            translatedItem.drug_interaction = await exports.translateWithCache(item.drug_interaction, target_lang);
+            translatedItem.adverse_reaction = await exports.translateWithCache(item.adverse_reaction, target_lang);
 
             return translatedItem;
         }));

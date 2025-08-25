@@ -3,13 +3,14 @@ const fs = require('fs/promises');
 
 exports.parseImage = async ( req, res ) => {
         const file = req.file;
-        const target_lang = req.body.lang;
+        const id = req.user.uid;
+
     try {
         if (!file) {
         return res.status(400).json({ message: 'file 필드가 필요합니다.' });
         }
 
-        const result = await similarService.parseImage( file, target_lang );
+        const result = await similarService.parseImage( file, id );
 
         return res.status(200).json( result );
 
@@ -21,14 +22,14 @@ exports.parseImage = async ( req, res ) => {
 
 exports.parseText = async ( req, res ) => {
     const text = req.body.text;
-    const target_lang = req.body.lang;
+        const id = req.user.uid;
 
     try {
         if (!text) {
         return res.status(400).json({ message: 'text 필드가 필요합니다.' });
         }
 
-        const result = await similarService.parseText( text, target_lang );
+        const result = await similarService.parseText( text, id );
 
         return res.status(200).json( result );
 

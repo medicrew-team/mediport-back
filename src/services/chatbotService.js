@@ -9,11 +9,13 @@ const redisClient = require('../config/redisClient');
 const ChatBot_URL = 'https://mediport-ai-dev.store/inference-v2';
 
 
-exports.chatbot = async( user_input, target_lang='ko' ) => {
+exports.chatbot = async( user_input, id ) => {
     if ( !user_input ) throw new Error('user_input is required');
     
     try{
-      
+        const [rows] = await db.query(query.getLang, [ id ]);
+        const target_lang = rows[0]?.language;     
+
       const { data } = await axios.post(ChatBot_URL,{
             user_input: user_input,
             lang: target_lang,

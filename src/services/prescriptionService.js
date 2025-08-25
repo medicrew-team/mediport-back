@@ -41,7 +41,7 @@ exports.translateWithCache = async ( text, targetLanguage ) => {
     }
 };
 
-exports.parseImage = async( file, target_lang='ko' ) => {
+exports.parseImage = async( file, id ) => {
     if ( !file ) throw new Error('file is required'); 
 
     try{
@@ -91,6 +91,11 @@ exports.parseImage = async( file, target_lang='ko' ) => {
             console.warn('Result is not an array, converting to array:', dataToProcess);
             dataToProcess = [dataToProcess];
         }
+        
+
+        const [rows] = await db.query(query.getLang, [ id ]);
+        const target_lang = rows[0]?.language;
+ 
         //한국어 요청 시 원본 반환
         if (target_lang !== 'ko') {
             const translatedData = await Promise.all(dataToProcess.map(async (item) => {
