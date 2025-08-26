@@ -75,7 +75,29 @@ const getLang = `
   SELECT language 
   FROM \`user\`
   WHERE user_id COLLATE utf8mb4_general_ci IN (?);
-`
+`;
+
+const historyUser = `
+  INSERT INTO chat_history (user_id, sender, message, created_at)
+  VALUES ( ?, ?, ?, NOW());
+`;
+
+const historyBot = `
+  INSERT INTO chat_history (user_id, sender, message, created_at)
+  VALUES ( ?, ?, ?, NOW());
+`;
+
+const showHistory =`
+  SELECT *
+  FROM (
+  SELECT sender, message, created_at, id
+  FROM chat_history
+  WHERE user_id = ?
+  ORDER BY created_at DESC, id DESC
+  LIMIT 10
+  ) AS recent_history
+  ORDER BY created_at ASC, id ASC;
+`;
 
 // CommonJS 방식으로 내보내기
 module.exports = {
@@ -84,4 +106,7 @@ module.exports = {
   parseText,
   parseKrImage,
   getLang,
+  historyUser,
+  historyBot,
+  showHistory,
 };
