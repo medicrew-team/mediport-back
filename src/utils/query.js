@@ -87,18 +87,6 @@ const historyBot = `
   VALUES ( ?, ?, ?, NOW());
 `;
 
-const showHistory =`
-  SELECT *
-  FROM (
-  SELECT sender, message, created_at, id
-  FROM chat_history
-  WHERE user_id = ?
-  ORDER BY created_at DESC, id DESC
-  LIMIT 10
-  ) AS recent_history
-  ORDER BY created_at ASC, id ASC;
-`;
-
 // CommonJS 방식으로 내보내기
 module.exports = {
   getBoardById,
@@ -108,5 +96,4 @@ module.exports = {
   getLang,
   historyUser,
   historyBot,
-  showHistory,
 };

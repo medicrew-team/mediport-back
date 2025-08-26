@@ -24,14 +24,8 @@ exports.chatbot = async( user_input, id ) => {
           Authorization: 'Bearer your-token',
           },
       });
-      
-       await db.query(query.historyUser, [ id, 'user', user_input ]);
 
-       const {result} = data;
-       await db.query(query.historyBot, [ id, 'bot', result ]);
-
-       const [history] = await db.query(query.showHistory, [ id ]);
-       return history;
+       return data;
 
         
     } catch (error) {
