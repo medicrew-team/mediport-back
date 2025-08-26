@@ -5,7 +5,7 @@ const fs = require('fs/promises');
 exports.chatbot = async ( req, res ) => {
         const user_input = req.body.user_input;
         const id = req.user.uid;
-            
+        
     try {
         if (!user_input) {
         return res.status(400).json({ message: 'text 필드가 필요합니다.' });
