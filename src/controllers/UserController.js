@@ -156,8 +156,8 @@ exports.getUserProhibitMedi = async (req, res) => {
 exports.getProhibitMediDetail = async (req, res) => {
     try {
         const { prod_name } = req.params;
-        const target_lang = req.body.lang || 'ko'; // 기본 언어는 한국어
-        const prohibitDetail = await UserService.getProhibitMediDetail(prod_name, target_lang);
+        const user_id = req.user.uid;
+        const prohibitDetail = await UserService.getProhibitMediDetail(prod_name, user_id);
         res.status(200).json({
             message: '금기약품 상세정보 조회 성공',
             prohibitDetail: prohibitDetail

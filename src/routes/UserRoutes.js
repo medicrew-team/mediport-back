@@ -340,7 +340,7 @@ router.get(
  *                   type: integer
  *                 description: 업데이트할 기저질환 ID 목록
  *             example:
- *               disease_ids: [1, 5, 12]
+ *               disease_ids: [1, 5, 9]
  *     responses:
  *       200:
  *         description: 기저질환 정보 업데이트 성공

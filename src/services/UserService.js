@@ -380,15 +380,16 @@ class UserService {
                 where: { disease_id: disease_id },
                 attributes: ['dur_chronic_id', 'dur_prod_name', 'ing_code', 'atc_code', 'atc_ing', 'caution', 'dur_prod_img']
             });
-            const language = await User.findByPk(user_id, {
+            const user = await User.findByPk(user_id, {
                 attributes: ['language']
             });
+
             if (!diseaseProhibit || diseaseProhibit.length === 0) {
                 throw new Error('해당 기저질환에 대한 금기약품이 없습니다.');
             }
-            if (target_lang !== 'ko') {
+            if (user.language !== 'ko') {
                 await Promise.all(diseaseProhibit.map(async (item) => {
-                    item.dataValues.caution = await this.translateWithCache(item.caution, language);
+                    item.dataValues.caution = await this.translateWithCache(item.caution, user.language);
                   }));
                 return diseaseProhibit;
             }
@@ -396,12 +397,13 @@ class UserService {
         
     }    catch (error) {
             console.error('사용자 기저질환 금기약품 조회 에러 : ', error);
+            console.log(language);
             throw new Error(`사용자 기저질환 금기약품 조회 실패: ${error.message}`);
         }
     }
 
     /** 금기약품 상세정보 조회 */
-    async getProhibitMediDetail(prod_name, target_lang = 'ko') {
+    async getProhibitMediDetail(prod_name, user_id) {
         try {
             const prohibitDetail = await DUR_chronic.findOne({
                 where: { dur_prod_name: prod_name },
@@ -410,8 +412,12 @@ class UserService {
             if (!prohibitDetail) {
                 throw new Error('해당 금기약품에 대한 정보가 없습니다.');
             }
-            if (target_lang !== 'ko') {
-                prohibitDetail.dataValues.caution = await this.translateWithCache(prohibitDetail.caution, target_lang);
+            const user = await User.findByPk(user_id, {
+                attributes: ['language']
+            });
+
+            if (user.language !== 'ko') {
+                prohibitDetail.dataValues.caution = await this.translateWithCache(prohibitDetail.caution, user.language);
             }
             return prohibitDetail;
         } catch (error) {
