@@ -136,8 +136,8 @@ exports.updateUserDiseases = async (req, res) => {
 exports.getUserProhibitMedi = async (req, res) => {
     try {
         const disease_id = req.params.disease_id;
-        const target_lang = req.body.lang || 'ko'; // 기본 언어는 한국어
-        const prohibit_medi = await UserService.getUserDiseasesProhibit(disease_id,target_lang);
+        const user_id = req.user.uid;
+        const prohibit_medi = await UserService.getUserDiseasesProhibit(disease_id,user_id);
         res.status(200).json({
             message: '사용자 기저질환 금기약품 조회 성공',
             prohibit_medi: prohibit_medi

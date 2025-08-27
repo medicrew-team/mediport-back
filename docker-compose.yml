@@ -4,7 +4,10 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./:/usr/src/app
+      # key.json과 mediport.json 파일을 읽기 전용으로 컨테이너에 마운트
+      - ./key.json:/usr/src/app/key.json:ro
+      - ./mediport.json:/usr/src/app/mediport.json:ro
+      # node_modules는 호스트와 공유하지 않음 (컨테이너 내 버전 사용)
       - /usr/src/app/node_modules
     depends_on:
       db:

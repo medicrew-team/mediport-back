@@ -374,18 +374,21 @@ class UserService {
         }    
     }  
     /** 기저질환 금기약품 조회 */
-    async getUserDiseasesProhibit(disease_id,target_lang= 'ko') {
+    async getUserDiseasesProhibit(disease_id,user_id) {
         try {
             const diseaseProhibit = await DUR_chronic.findAll({
                 where: { disease_id: disease_id },
                 attributes: ['dur_chronic_id', 'dur_prod_name', 'ing_code', 'atc_code', 'atc_ing', 'caution', 'dur_prod_img']
+            });
+            const language = await User.findByPk(user_id, {
+                attributes: ['language']
             });
             if (!diseaseProhibit || diseaseProhibit.length === 0) {
                 throw new Error('해당 기저질환에 대한 금기약품이 없습니다.');
             }
             if (target_lang !== 'ko') {
                 await Promise.all(diseaseProhibit.map(async (item) => {
-                    item.dataValues.caution = await this.translateWithCache(item.caution, target_lang);
+                    item.dataValues.caution = await this.translateWithCache(item.caution, language);
                   }));
                 return diseaseProhibit;
             }
