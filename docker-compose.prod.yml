@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: mediport-app
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      # Firebase/Google API 키 파일들 읽기 전용 마운트
+      - ./key.json:/usr/src/app/key.json:ro
+      - ./mediport.json:/usr/src/app/mediport.json:ro
+      # node_modules는 호스트와 공유하지 않음 (컨테이너 내 버전 사용)
+      - /usr/src/app/node_modules
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
