@@ -2,12 +2,13 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const DUR_medi = sequelize.define('DUR_medi', {
-    DUR_medi_id: {
+const dur_medi = sequelize.define('dur_medi', {
+    dur_medi_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
+        field: 'dur_medi_id'
     },
     // 제품명
     dur_prod_name: {
@@ -27,7 +28,8 @@ const DUR_medi = sequelize.define('DUR_medi', {
     // 성분명 (모델 필드명 소문자, DB 컬럼명 대문자일 경우 field 옵션 사용)
     atc_ing: { 
         type: DataTypes.STRING(255), 
-        allowNull: false
+        allowNull: false,
+        field: 'atc_ing'
     },
     // 약품이미지
     dur_prod_img: {
@@ -35,8 +37,8 @@ const DUR_medi = sequelize.define('DUR_medi', {
         allowNull: true
     }
 }, {
-    tableName: 'DUR_medi', // 실제 DB 테이블 이름과 일치하는지 확인 (대소문자)
+    tableName: 'dur_medi', // 실제 DB 테이블 이름과 일치하는지 확인 (대소문자)
     timestamps: false,
 });
 
-module.exports = DUR_medi;
+module.exports = dur_medi;

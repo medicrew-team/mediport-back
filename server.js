@@ -7,7 +7,7 @@ const setupModels = require('./src/models');
 
 // 포트 설정 (환경 변수 사용 또는 기본값)
 const PORT = process.env.PORT || 3000; // .env의 PORT 변수를 사용하거나 기본값 3000
-
+const HOST = '0.0.0.0';
 // 서버 시작 함수
 async function startServer() {
     try {
@@ -19,16 +19,10 @@ async function startServer() {
         // src/models/index.js와 같은 파일에서 모든 모델을 require 하고 관계를 설정하는 로직을 통합하는 것이 좋습니다.
         setupModels(); // 모든 모델을 로드하고 관계를 설정하는 함수 호출 (아래 설명)
 
-        // 3. Sequelize 모델들을 DB와 동기화 (개발 환경에서만 권장)
-        // 주의: production 환경에서는 마이그레이션 도구를 사용해야 합니다.
-        if (process.env.NODE_ENV === 'development') {
-            await sequelize.sync({ alter: true }); // 개발 시: 테이블이 없으면 생성, 변경사항 있으면 수정
-            console.log('모든 모델이 성공적으로 동기화되었습니다.');
-        }
+        console.log('모델 관계 설정 완료.');
 
-
-        // 4. Express 서버 시작
-        app.listen(PORT, () => {
+        // 3. Express 서버 시작
+        app.listen(PORT,HOST, () => {
             console.log(`Server running on port ${PORT}`);
             console.log(`Access URL: http://localhost:${PORT}`);
         });

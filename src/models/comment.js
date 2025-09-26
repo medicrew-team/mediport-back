@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const Comment = sequelize.define('Comment', {
+const comment = sequelize.define('comment', {
     // 댓글 id
     comment_id: {
         type: DataTypes.INTEGER,
@@ -16,10 +16,10 @@ const Comment = sequelize.define('Comment', {
     },
     // 작성자 ID (외래키)
     user_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(255),
         allowNull: false,
         references: {
-            model: 'User',
+            model: 'user',
             key: 'user_id'
         },
         onUpdate: 'CASCADE',
@@ -30,7 +30,7 @@ const Comment = sequelize.define('Comment', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Board',
+            model: 'board',
             key: 'board_id'
         },
         onUpdate: 'CASCADE',
@@ -38,11 +38,11 @@ const Comment = sequelize.define('Comment', {
     },
 
 }, {
-    tableName: 'Comment',
+    tableName: 'comment',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = Comment;
+module.exports = comment;
 

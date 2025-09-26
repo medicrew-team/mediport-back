@@ -1,0 +1,50 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      # key.json과 mediport.json 파일을 읽기 전용으로 컨테이너에 마운트
+      - ./key.json:/usr/src/app/key.json:ro
+      - ./mediport.json:/usr/src/app/mediport.json:ro
+      # node_modules는 호스트와 공유하지 않음 (컨테이너 내 버전 사용)
+      - /usr/src/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - ./.env
+
+  db:
+    image: mysql:8.0
+    env_file:
+      - ./.env
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./mediport-backend.sql:/docker-entrypoint-initdb.d/mediport-backend.sql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+  redis-data:

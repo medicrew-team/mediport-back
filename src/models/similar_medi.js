@@ -1,36 +1,32 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-const Similar_medi = sequelize.define('Similar_medi',{
-    similar_medi_id:
-    {
+const SimilarMedi = sequelize.define('SimilarMedi',{
+    similar_medi_id: {
        type: DataTypes.INTEGER,
        autoIncrement: true,
        primaryKey: true,
-       allowNull: false,
+       allowNull: false
     },
     international_medi_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'International_medi',
-            key: 'International_medi_id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+            model: 'international_medi',
+            key: 'international_medi_id'
+        }
     },
     kr_medi_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'KR_medi',
+            model: 'kr_medi',
             key: 'kr_medi_id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        }
     }
 },{
-    tableName: 'Similar_medi'
-})
+    tableName: 'similar_medi',
+    timestamps: true
+});
 
-module.exports= Similar_medi;
+module.exports = SimilarMedi;

@@ -4,7 +4,7 @@ const { sequelize } = require('../config/sequelize');
 
 
 
-const Board = sequelize.define('Board', {
+const board = sequelize.define('board', {
     //게시판 id
     board_id: {
         type: DataTypes.INTEGER,
@@ -24,10 +24,10 @@ const Board = sequelize.define('Board', {
     },
     // 작성자 ID (외래키)
     user_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(255),
         allowNull: false,
         references: {
-            model: 'User',
+            model: 'user',
             key: 'user_id'
         },
         onUpdate: 'CASCADE',
@@ -39,12 +39,24 @@ const Board = sequelize.define('Board', {
         defaultValue: 0,
         allowNull: false
     },
+    // 카테고리
+    category_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'category',
+            key: 'category_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL' // 카테고리가 삭제되면 이 게시판의 카테고리는 NULL로 설정
+    },
+    
 
 }, {
-    tableName: 'Board',
+    tableName: 'board',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = Board;
+module.exports = board;
