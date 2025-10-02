@@ -397,7 +397,6 @@ class UserService {
         
     }    catch (error) {
             console.error('사용자 기저질환 금기약품 조회 에러 : ', error);
-            console.log(language);
             throw new Error(`사용자 기저질환 금기약품 조회 실패: ${error.message}`);
         }
     }
