@@ -48,6 +48,33 @@ Mediport 백엔드 서버입니다.
 </details>
 
 ---
+# 🏗️ System Architecture
+
+Mediport의 서비스 흐름을 나타낸 아키텍처 다이어그램입니다.  
+사용자 입력이 어떻게 인증을 거쳐 백엔드/AI 모듈/외부 API와 연결되는지 보여줍니다.  
+
+<details>
+<summary>서비스 아키텍처 보기</summary>
+
+![System Architecture](./src/docs/system-architecture.png)
+
+</details>
+
+---
+
+# ☁️ Infra Architecture (Deployment)
+
+Mediport의 실제 배포 환경을 나타낸 아키텍처 다이어그램입니다.  
+AWS 인프라 기반으로 Public/Private Subnet을 구분하고, EC2, RDS, Redis, FastAPI, 외부 API(OpenAI, Google Cloud)와의 통신 구조를 보여줍니다.  
+
+<details>
+<summary>인프라 아키텍처 보기</summary>
+
+![Infrastructure Architecture](docs/infrastructure-architecture.png)
+
+</details>
+
+---
 
 ## 🛠️ 기술 스택
 
