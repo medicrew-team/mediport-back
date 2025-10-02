@@ -42,8 +42,11 @@ Mediport 백엔드 서버입니다.
 ## 🗂️ 데이터베이스 ERD
 <details>
 <summary>ERD 보기</summary>
+  
 ![ERD](./src/docs/Untitled.svg)
+
 </details>
+
 ---
 
 ## 🛠️ 기술 스택
@@ -56,3 +59,4 @@ Mediport 백엔드 서버입니다.
   - Google Cloud Translate (번역)  
   - Google Cloud Speech-to-Text (STT)
 - **Documentation & Tools** : Swagger,Postman
+- **Collaboration** : Slack, Google Drive, Github, Figma
