@@ -41,7 +41,7 @@ Mediport 백엔드 서버입니다.
 
 ## 🗂️ 데이터베이스 ERD
 
-![ERD](./src/docs/mediport(4).png)
+![ERD](./src/docs/Untitled.svg)
 
 ---
 
