@@ -36,7 +36,10 @@ app.use('/api/prescription', prescriptionRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/restricts', restrictRoutes);
 
-
+//healthcheck
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
 // 기본 라우트 (루트 경로 접근 시)
 const path = require('path');
 
