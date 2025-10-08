@@ -56,7 +56,7 @@ Mediport의 서비스 흐름을 나타낸 아키텍처 다이어그램입니다.
 <details>
 <summary>서비스 아키텍처 보기</summary>
 
-![System Architecture](./src/docs/system-architecture1.png)
+![System Architecture](./src/docs/system-architecture2.png)
 
 </details>
 
