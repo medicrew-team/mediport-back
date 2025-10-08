@@ -53,7 +53,7 @@ jobs:
           debug: true                         # 🧩 디버그 모드 (로그 자세히 보기)
           script: |
             echo "🚀 Starting MediPort deployment on EC2..."
-            cd /home/ubuntu/mediport
+            cd /home/ubuntu/mediport-back
             echo "✅ Entered directory: $(pwd)"
 
             # 권한 확인 및 배포 실행
