@@ -15,9 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ GitHub 저장소 코드 가져오기
+      # 1️⃣ GitHub 저장소 최신 코드 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # ✅ shallow clone 방지 (항상 최신 main 전체)
 
       # 2️⃣ AWS 인증 구성
       - name: Configure AWS credentials
@@ -32,12 +34,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # 4️⃣ Docker 이미지 빌드 및 ECR 푸시
+      # 4️⃣ Docker 이미지 빌드 및 ECR 푸시 (항상 최신 소스로 강제 재빌드)
       - name: Build and Push Docker image to ECR
         run: |
           IMAGE_TAG=${{ github.run_number }}
           echo "🔧 Building MediPort image with tag: $IMAGE_TAG"
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          
+          # ✅ mediport-back 디렉토리를 명시적으로 컨텍스트로 지정
+          docker build --no-cache -t $ECR_REPOSITORY:$IMAGE_TAG .
+
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
@@ -47,16 +52,15 @@ jobs:
         uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu                    # ✅ Ubuntu 인스턴스에 맞게 설정
-          key: ${{ secrets.EC2_SSH_KEY }}     # ✅ PEM 원문 그대로 등록한 Secret
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
           script_stop: true
-          debug: true                         # 🧩 디버그 모드 (로그 자세히 보기)
+          debug: true
           script: |
             echo "🚀 Starting MediPort deployment on EC2..."
             cd /home/ubuntu/mediport-back
             echo "✅ Entered directory: $(pwd)"
 
-            # 권한 확인 및 배포 실행
             chmod +x deploy.sh
             ./deploy.sh ${{ env.IMAGE_TAG }}
 
