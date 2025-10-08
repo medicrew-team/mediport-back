@@ -1,9 +1,9 @@
-name: 🚀 Deploy to EC2 via ECR
+name: 🚀 Deploy MediPort to EC2
 
 on:
   push:
     branches:
-      - main  # main 브랜치에 push될 때만 동작
+      - main  # 배포 트리거 브랜치
 
 env:
   AWS_REGION: ap-northeast-2
@@ -11,13 +11,15 @@ env:
   ECR_REGISTRY: 891377003120.dkr.ecr.ap-northeast-2.amazonaws.com
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -25,25 +27,28 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # 3️⃣ Login to Amazon ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker image
+      # 4️⃣ Build, tag, and push image to ECR
+      - name: Build and Push Docker image
         run: |
-          docker build -t $ECR_REPOSITORY .
-          docker tag $ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          IMAGE_TAG=${{ github.run_number }}
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-      - name: Push Docker image to ECR
-        run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-
-      - name: 🚀 Deploy on EC2
-        uses: appleboy/ssh-action@v0.1.10
+      # 5️⃣ Deploy to EC2 via SSH
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/mediport-back
-            ./deploy.sh
+            cd /home/ec2-user/mediport
+            chmod +x deploy.sh
+            ./deploy.sh ${{ env.IMAGE_TAG }}
