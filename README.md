@@ -70,7 +70,7 @@ AWS 인프라 기반으로 Public/Private Subnet을 구분하고, EC2, RDS, Redi
 <details>
 <summary>인프라 아키텍처 보기</summary>
 
-![Infrastructure Architecture](docs/infrastructure-architecture.png)
+![Infrastructure Architecture](./src/docs/infrastructure-architecture.png)
 
 </details>
 
