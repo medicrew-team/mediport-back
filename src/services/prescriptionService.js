@@ -12,6 +12,7 @@ const translate = new Translate();
 const OCR_URL = 'https://mediport-ai-dev.store/ocr/korean-medicine';
 
 
+/**cicd 테스트용 */
  /** 텍스트 번역 */
 exports.translateWithCache = async ( text, targetLanguage ) => {
       const cacheKey = `translate:${targetLanguage}:${text}`;
