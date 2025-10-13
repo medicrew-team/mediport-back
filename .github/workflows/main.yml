@@ -8,7 +8,7 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: mediport-back
-  ECR_REGISTRY: 286190384884.dkr.ecr.ap-northeast-2.amazonaws.com
+  ECR_REGISTRY: 286190384884.dkr.ecr.ap-northeast-2.amazonaws.com  
   
   build-and-deploy:
     runs-on: ubuntu-latest
