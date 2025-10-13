@@ -1,0 +1,69 @@
+name: 🚀 Deploy MediPort Backend to EC2 (Ubuntu)
+
+on:
+  push:
+    branches:
+      - main  # ✅ main 브랜치 푸시 시 자동 배포
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: mediport-back
+  ECR_REGISTRY: <계정ID>.dkr.ecr.ap-northeast-2.amazonaws.com
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ GitHub 저장소 최신 코드 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # ✅ shallow clone 방지 (항상 최신 main 전체)
+
+      # 2️⃣ AWS 인증 구성
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 3️⃣ ECR 로그인
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 4️⃣ Docker 이미지 빌드 및 ECR 푸시 (항상 최신 소스로 강제 재빌드)
+      - name: Build and Push Docker image to ECR
+        run: |
+          IMAGE_TAG=${{ github.run_number }}
+          echo "🔧 Building MediPort image with tag: $IMAGE_TAG"
+          
+          # ✅ mediport-back 디렉토리를 명시적으로 컨텍스트로 지정
+          docker build --no-cache -t $ECR_REPOSITORY:$IMAGE_TAG .
+
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      # 5️⃣ EC2에 SSH 접속 후 배포 스크립트 실행
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          debug: true
+          script: |
+            echo "🚀 Starting MediPort deployment on EC2..."
+            cd /home/ubuntu/mediport-back
+            echo "✅ Entered directory: $(pwd)"
+
+            chmod +x deploy.sh
+            ./deploy.sh ${{ env.IMAGE_TAG }}
+
+            echo "✅ MediPort deployment finished successfully."
+
+​
